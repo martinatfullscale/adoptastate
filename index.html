@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adopt-A-State | You Already Donated</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #f5f0e8;
+      --warm-white: #faf8f3;
+      --brown: #3a2a1a;
+      --mid-brown: #7a5c3a;
+      --amber: #c8860a;
+      --faded-red: #b84040;
+      --faded-blue: #3a5a8a;
+      --soft-gray: #d8d0c4;
+      --text-muted: #8a7a6a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--brown);
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-weight: 300;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* ── TOP BANNER ── */
+    .top-banner {
+      background: var(--brown);
+      color: var(--cream);
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--warm-white);
+      border-bottom: 1px solid var(--soft-gray);
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-heart {
+      font-size: 24px;
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    nav .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mid-brown);
+    }
+
+    nav .nav-links a { text-decoration: none; color: inherit; }
+    nav .nav-links a:hover { color: var(--amber); }
+
+    .nav-cta {
+      background: var(--amber);
+      color: white;
+      padding: 10px 22px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      font-family: 'Source Serif 4', serif;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: var(--brown);
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        linear-gradient(to right, rgba(30,18,8,0.95) 45%, rgba(30,18,8,0.3) 100%),
+        url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600') center/cover no-repeat;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 640px;
+      padding: 80px 80px;
+    }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(38px, 5vw, 62px);
+      line-height: 1.1;
+      color: var(--warm-white);
+      margin-bottom: 28px;
+      font-weight: 700;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--amber);
+    }
+
+    .hero p {
+      font-size: 18px;
+      line-height: 1.7;
+      color: rgba(245,240,232,0.8);
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      background: var(--amber);
+      color: white;
+      padding: 16px 36px;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      font-family: 'Source Serif 4', serif;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: #a06d08; }
+
+    .btn-ghost {
+      color: var(--warm-white);
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Source Serif 4', serif;
+      opacity: 0.7;
+    }
+
+    .hero-stat-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(200,134,10,0.15);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(200,134,10,0.3);
+      display: flex;
+      justify-content: center;
+      gap: 80px;
+      padding: 24px;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--amber);
+    }
+
+    .hero-stat .label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.6);
+      margin-top: 4px;
+    }
+
+    /* ── INTRO SECTION ── */
+    .intro {
+      max-width: 760px;
+      margin: 100px auto;
+      padding: 0 40px;
+      text-align: center;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 20px;
+    }
+
+    .intro h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 3.5vw, 44px);
+      line-height: 1.25;
+      margin-bottom: 28px;
+    }
+
+    .intro p {
+      font-size: 17px;
+      line-height: 1.8;
+      color: var(--mid-brown);
+      margin-bottom: 20px;
+    }
+
+    .intro .attribution {
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--soft-gray);
+    }
+
+    /* ── STATE PROFILES ── */
+    .profiles-section {
+      background: var(--warm-white);
+      padding: 80px 40px;
+    }
+
+    .profiles-section .section-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 60px;
+    }
+
+    .profiles-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      margin-bottom: 16px;
+    }
+
+    .profiles-section .sub {
+      font-size: 16px;
+      color: var(--mid-brown);
+      line-height: 1.7;
+    }
+
+    .profiles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .state-card {
+      background: var(--cream);
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .state-card:hover { transform: translateY(-3px); }
+
+    .state-card .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .state-emoji {
+      font-size: 48px;
+      line-height: 1;
+    }
+
+    .dependency-badge {
+      background: var(--faded-red);
+      color: white;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 12px;
+    }
+
+    .state-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .state-tagline {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+
+    .state-stats {
+      border-top: 1px solid var(--soft-gray);
+      padding-top: 20px;
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .state-stat-item .s-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--faded-red);
+      font-weight: 700;
+    }
+
+    .state-stat-item .s-label {
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .state-description {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--mid-brown);
+      margin-bottom: 24px;
+    }
+
+    .adopt-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--mid-brown);
+      padding: 13px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Source Serif 4', serif;
+      color: var(--brown);
+      transition: all 0.2s;
+    }
+
+    .adopt-btn:hover {
+      background: var(--brown);
+      color: var(--cream);
+    }
+
+    .card-watermark {
+      position: absolute;
+      top: 20px;
+      right: -10px;
+      font-size: 80px;
+      opacity: 0.04;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    /* ── CERTIFICATE ── */
+    .certificate-section {
+      padding: 100px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .certificate-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      margin-bottom: 16px;
+    }
+
+    .certificate-section .sub {
+      font-size: 16px;
+      color: var(--mid-brown);
+      margin-bottom: 50px;
+      line-height: 1.7;
+    }
+
+    .cert-selector {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .cert-selector select {
+      font-family: 'Source Serif 4', serif;
+      font-size: 14px;
+      padding: 12px 20px;
+      border: 1px solid var(--soft-gray);
+      background: var(--warm-white);
+      color: var(--brown);
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      appearance: none;
+      min-width: 220px;
+    }
+
+    .cert-selector button {
+      background: var(--amber);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Source Serif 4', serif;
+    }
+
+    /* Certificate Document */
+    #certificate-output {
+      border: 2px solid var(--soft-gray);
+      background: var(--warm-white);
+      padding: 60px;
+      position: relative;
+      text-align: center;
+      display: none;
+    }
+
+    #certificate-output.visible { display: block; }
+
+    .cert-border-outer {
+      border: 1px solid var(--soft-gray);
+      padding: 40px;
+      position: relative;
+    }
+
+    .cert-corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: var(--amber);
+      border-style: solid;
+    }
+    .cert-corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+    .cert-corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+    .cert-corner.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+    .cert-corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+    .cert-eyebrow {
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 16px;
+    }
+
+    .cert-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      margin-bottom: 24px;
+    }
+
+    .cert-divider {
+      width: 60px;
+      height: 1px;
+      background: var(--amber);
+      margin: 0 auto 24px;
+    }
+
+    .cert-body {
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--mid-brown);
+      max-width: 560px;
+      margin: 0 auto 32px;
+    }
+
+    .cert-amount {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      color: var(--faded-blue);
+      font-weight: 700;
+      margin: 16px 0;
+    }
+
+    .cert-fine-print {
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--soft-gray);
+    }
+
+    .cert-seal {
+      width: 80px;
+      height: 80px;
+      border: 2px solid var(--amber);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 24px auto 0;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--amber);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .cert-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .cert-actions button {
+      padding: 12px 28px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Source Serif 4', serif;
+    }
+
+    .btn-download {
+      background: var(--brown);
+      color: var(--cream);
+      border: none;
+    }
+
+    .btn-share {
+      background: transparent;
+      border: 1px solid var(--brown);
+      color: var(--brown);
+    }
+
+    /* ── QUOTE BANNER ── */
+    .quote-banner {
+      background: var(--brown);
+      color: var(--cream);
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .quote-banner blockquote {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 3vw, 38px);
+      font-style: italic;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    .quote-banner .source {
+      margin-top: 32px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+
+    /* ── INFRA CARDS ── */
+    .infra-section {
+      background: var(--faded-blue);
+      padding: 80px 40px;
+    }
+
+    .infra-section .section-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 50px;
+    }
+
+    .infra-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      color: var(--cream);
+      margin-bottom: 14px;
+    }
+
+    .infra-section .sub {
+      font-size: 15px;
+      color: rgba(245,240,232,0.7);
+      line-height: 1.7;
+    }
+
+    .infra-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .infra-card {
+      background: rgba(245,240,232,0.06);
+      border: 1px solid rgba(245,240,232,0.12);
+      padding: 36px;
+      color: var(--cream);
+    }
+
+    .infra-card .sponsor-label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.4);
+      margin-bottom: 12px;
+    }
+
+    .infra-card .infra-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .infra-card .infra-detail {
+      font-size: 13px;
+      color: rgba(245,240,232,0.6);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .infra-card .sponsor-tag {
+      display: inline-block;
+      background: rgba(200,134,10,0.2);
+      border: 1px solid rgba(200,134,10,0.4);
+      color: var(--amber);
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 6px 12px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--brown);
+      color: rgba(245,240,232,0.5);
+      padding: 60px 40px 40px;
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(245,240,232,0.1);
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo .logo-text {
+      color: var(--cream);
+      font-size: 24px;
+    }
+
+    .footer-logo .logo-sub {
+      color: rgba(245,240,232,0.4);
+      margin-top: 4px;
+    }
+
+    .footer-tagline {
+      font-size: 14px;
+      font-style: italic;
+      color: rgba(245,240,232,0.6);
+      margin-top: 12px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+
+    .footer-col h4 {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-col ul a {
+      font-size: 13px;
+      color: rgba(245,240,232,0.5);
+      text-decoration: none;
+    }
+
+    .footer-col ul a:hover { color: var(--cream); }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-disclaimer {
+      font-size: 11px;
+      line-height: 1.6;
+      max-width: 600px;
+    }
+
+    .footer-disclaimer em {
+      color: var(--amber);
+      font-style: normal;
+    }
+
+    /* ── MODAL / OVERLAY ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(30,18,8,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--warm-white);
+      max-width: 520px;
+      width: 100%;
+      padding: 50px;
+      position: relative;
+      text-align: center;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--mid-brown);
+    }
+
+    .modal h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .modal .state-flag {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .modal p {
+      font-size: 15px;
+      color: var(--mid-brown);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .modal .modal-cta {
+      background: var(--amber);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Source Serif 4', serif;
+      margin-top: 12px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero-content { padding: 60px 30px; }
+      nav .nav-links { display: none; }
+      .hero-stat-bar { gap: 30px; flex-wrap: wrap; padding: 20px 16px; }
+      .intro { margin: 60px auto; padding: 0 24px; }
+      .profiles-section { padding: 60px 20px; }
+      .profiles-grid { grid-template-columns: 1fr; }
+      .certificate-section { padding: 60px 24px; }
+      #certificate-output { padding: 30px 20px; }
+      .cert-border-outer { padding: 20px; }
+      .footer-links { gap: 32px; }
+      .footer-top { flex-direction: column; }
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-content > * {
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-content > *:nth-child(1) { animation-delay: 0.1s; }
+    .hero-content > *:nth-child(2) { animation-delay: 0.25s; }
+    .hero-content > *:nth-child(3) { animation-delay: 0.4s; }
+    .hero-content > *:nth-child(4) { animation-delay: 0.55s; }
+  </style>
+</head>
+<body>
+
+<!-- TOP BANNER -->
+<div class="top-banner">
+  You already donated. We just wanted you to know. 🫶
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <span class="logo-heart">🫶</span>
+    <div>
+      <span class="logo-text">Adopt-A-State</span>
+      <span class="logo-sub">A Taxpayer Awareness Initiative</span>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Our Mission</a></li>
+    <li><a href="#">The States</a></li>
+    <li><a href="#">The Data</a></li>
+    <li><a href="#">Certificate</a></li>
+  </ul>
+  <button class="nav-cta">Get Your Certificate</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">A Message of Gratitude</p>
+    <h1>You've been<br>giving all along.<br><em>Thank you.</em></h1>
+    <p>For years, taxpayers in blue states have quietly contributed billions more than they've received. No ribbon-cutting. No press release. Just roads. Schools. Hospitals. Quietly keeping America afloat.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('cert-section').scrollIntoView({behavior:'smooth'})">See Your Impact</button>
+      <button class="btn-ghost" onclick="document.getElementById('profiles').scrollIntoView({behavior:'smooth'})">Meet the States →</button>
+    </div>
+  </div>
+  <div class="hero-stat-bar">
+    <div class="hero-stat">
+      <div class="num">$13.7B</div>
+      <div class="label">California's Net Contribution</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">$2.13</div>
+      <div class="label">Mississippi Receives per $1 Sent</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">34</div>
+      <div class="label">States Receiving More Than They Give</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">$0</div>
+      <div class="label">Thank You Notes Received</div>
+    </div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="intro">
+  <p class="section-label">About This Initiative</p>
+  <h2>Some states could not do it without you. They never could.</h2>
+  <p>Every year, the federal government collects taxes and redistributes them across all 50 states. And every year, a handful of states put in more than they take out. The others... let's just say they appreciate the generosity. Even if they don't always say so.</p>
+  <p>Adopt-A-State is a taxpayer awareness initiative dedicated to helping the donors of this great nation understand the full scope of their quiet, involuntary philanthropy.</p>
+  <p class="attribution">All data sourced from the Rockefeller Institute of Government, Tax Foundation, and USASpending.gov. This is real. All of it.</p>
+</section>
+
+<!-- STATE PROFILES -->
+<section class="profiles-section" id="profiles">
+  <div class="section-header">
+    <p class="section-label">Meet Your Beneficiaries</p>
+    <h2>States in Need</h2>
+    <p class="sub">These states are doing their best. With your help, they are managing. Please continue your support.</p>
+  </div>
+  <div class="profiles-grid">
+
+    <div class="state-card">
+      <div class="card-watermark">MS</div>
+      <div class="card-top">
+        <span class="state-emoji">🌊</span>
+        <span class="dependency-badge">High Dependency</span>
+      </div>
+      <div class="state-name">Mississippi</div>
+      <div class="state-tagline">"America's Most Beloved Beneficiary"</div>
+      <div class="state-stats">
+        <div class="state-stat-item">
+          <div class="s-num">$2.13</div>
+          <div class="s-label">per $1 given</div>
+        </div>
+        <div class="state-stat-item">
+          <div class="s-num">$4.1B</div>
+          <div class="s-label">net received (2023)</div>
+        </div>
+      </div>
+      <p class="state-description">Mississippi has been receiving more than it contributes for decades. With your continued support, its roads remain passable, its schools remain open, and its bridges remain... largely intact.</p>
+      <button class="adopt-btn" onclick="openModal('Mississippi', '🌊', '$4.1 billion', 'Mississippi has been part of the Adopt-A-State program since its founding. Thanks to donors like you, it continues to function.')">
+        You Already Adopted Mississippi
+      </button>
+    </div>
+
+    <div class="state-card">
+      <div class="card-watermark">KY</div>
+      <div class="card-top">
+        <span class="state-emoji">🐎</span>
+        <span class="dependency-badge">High Dependency</span>
+      </div>
+      <div class="state-name">Kentucky</div>
+      <div class="state-tagline">"Bootstraps Not Included"</div>
+      <div class="state-stats">
+        <div class="state-stat-item">
+          <div class="s-num">$2.41</div>
+          <div class="s-label">per $1 given</div>
+        </div>
+        <div class="state-stat-item">
+          <div class="s-num">$22.9B</div>
+          <div class="s-label">net received (2023)</div>
+        </div>
+      </div>
+      <p class="state-description">Kentucky receives the most federal aid per capita of any state. It has strong opinions about government spending. It would like you to know that these two facts are unrelated.</p>
+      <button class="adopt-btn" onclick="openModal('Kentucky', '🐎', '$22.9 billion', 'Kentucky has proudly participated in the federal redistribution program since the New Deal. It remains deeply committed to fiscal independence, in theory.')">
+        You Already Adopted Kentucky
+      </button>
+    </div>
+
+    <div class="state-card">
+      <div class="card-watermark">WV</div>
+      <div class="card-top">
+        <span class="state-emoji">⛰️</span>
+        <span class="dependency-badge">Critical Dependency</span>
+      </div>
+      <div class="state-name">West Virginia</div>
+      <div class="state-tagline">"Almost Heaven, Fully Funded"</div>
+      <div class="state-stats">
+        <div class="state-stat-item">
+          <div class="s-num">$2.07</div>
+          <div class="s-label">per $1 given</div>
+        </div>
+        <div class="state-stat-item">
+          <div class="s-num">$6.5B</div>
+          <div class="s-label">net received (2023)</div>
+        </div>
+      </div>
+      <p class="state-description">West Virginia's mountain roads, rural hospitals, and aging infrastructure are maintained in part thanks to the generous, involuntary contributions of New York, New Jersey, and California taxpayers. Always has been.</p>
+      <button class="adopt-btn" onclick="openModal('West Virginia', '⛰️', '$6.5 billion', 'West Virginia is a beautiful state with a complex relationship to federal funding. We are grateful it allows us to help.')">
+        You Already Adopted West Virginia
+      </button>
+    </div>
+
+    <div class="state-card">
+      <div class="card-watermark">AL</div>
+      <div class="card-top">
+        <span class="state-emoji">🌺</span>
+        <span class="dependency-badge">High Dependency</span>
+      </div>
+      <div class="state-name">Alabama</div>
+      <div class="state-tagline">"Roll Tide. Cash Flows."</div>
+      <div class="state-stats">
+        <div class="state-stat-item">
+          <div class="s-num">$1.99</div>
+          <div class="s-label">per $1 given</div>
+        </div>
+        <div class="state-stat-item">
+          <div class="s-num">$10.2B</div>
+          <div class="s-label">net received (2023)</div>
+        </div>
+      </div>
+      <p class="state-description">Alabama is a proud, independent state that receives nearly twice what it contributes to the federal system. It has strong feelings about self-reliance. Your taxes helped pave I-65. You're welcome.</p>
+      <button class="adopt-btn" onclick="openModal('Alabama', '🌺', '$10.2 billion', 'Alabama deeply values independence. It simply values your tax dollars slightly more.')">
+        You Already Adopted Alabama
+      </button>
+    </div>
+
+    <div class="state-card">
+      <div class="card-watermark">SC</div>
+      <div class="card-top">
+        <span class="state-emoji">🌴</span>
+        <span class="dependency-badge">High Dependency</span>
+      </div>
+      <div class="state-name">South Carolina</div>
+      <div class="state-tagline">"Smiling Faces. Balanced by Others."</div>
+      <div class="state-stats">
+        <div class="state-stat-item">
+          <div class="s-num">$1.71</div>
+          <div class="s-label">per $1 given</div>
+        </div>
+        <div class="state-stat-item">
+          <div class="s-num">$7.9B</div>
+          <div class="s-label">net received (2023)</div>
+        </div>
+      </div>
+      <p class="state-description">South Carolina has beautiful beaches and deeply held convictions about small government. Its Medicaid program, military bases, and federal highway funding are deeply grateful for the ongoing arrangement.</p>
+      <button class="adopt-btn" onclick="openModal('South Carolina', '🌴', '$7.9 billion', 'South Carolina believes in pulling itself up by its bootstraps. The bootstraps were federally subsidized.')">
+        You Already Adopted South Carolina
+      </button>
+    </div>
+
+    <div class="state-card">
+      <div class="card-watermark">AK</div>
+      <div class="card-top">
+        <span class="state-emoji">🐻</span>
+        <span class="dependency-badge">Critical Dependency</span>
+      </div>
+      <div class="state-name">Alaska</div>
+      <div class="state-tagline">"Frontier Spirit. Federal Funding."</div>
+      <div class="state-stats">
+        <div class="state-stat-item">
+          <div class="s-num">$1.84</div>
+          <div class="s-label">per $1 given</div>
+        </div>
+        <div class="state-stat-item">
+          <div class="s-num">$5.1B</div>
+          <div class="s-label">net received (2023)</div>
+        </div>
+      </div>
+      <p class="state-description">Alaska receives more federal money per capita than almost any state in the union. It also pays its residents a dividend to live there. Both of these things coexist peacefully, apparently.</p>
+      <button class="adopt-btn" onclick="openModal('Alaska', '🐻', '$5.1 billion', 'Alaska values rugged individualism and has operationalized that value through robust federal subsidy collection.')">
+        You Already Adopted Alaska
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- QUOTE BANNER -->
+<div class="quote-banner">
+  <blockquote>"The beauty of Adopt-A-State is that you never had a choice. But you can still feel good about it."</blockquote>
+  <p class="source">Adopt-A-State Founder &bull; Unpaid, Like Most of This</p>
+</div>
+
+<!-- CERTIFICATE SECTION -->
+<section class="certificate-section" id="cert-section">
+  <p class="section-label">Your Official Documentation</p>
+  <h2>Claim Your Certificate of Generosity</h2>
+  <p class="sub">You've been contributing all along. The least we can do is give you a piece of paper about it. Select your state and we'll generate your official certificate of involuntary philanthropy.</p>
+
+  <div class="cert-selector">
+    <select id="donor-state">
+      <option value="">Select Your Home State</option>
+      <option value="California|$13.7 billion|California">🌴 California</option>
+      <option value="New York|$22.5 billion|New York">🗽 New York</option>
+      <option value="New Jersey|$9.6 billion|New Jersey">🏙️ New Jersey</option>
+      <option value="Massachusetts|$7.2 billion|Massachusetts">🦞 Massachusetts</option>
+      <option value="Illinois|$5.5 billion|Illinois">🌆 Illinois</option>
+      <option value="Washington|$4.8 billion|Washington">🌲 Washington</option>
+      <option value="Colorado|$3.1 billion|Colorado">🏔️ Colorado</option>
+      <option value="Minnesota|$2.4 billion|Minnesota">🌨️ Minnesota</option>
+    </select>
+    <button onclick="generateCert()">Generate My Certificate</button>
+  </div>
+
+  <div id="certificate-output">
+    <div class="cert-border-outer">
+      <div class="cert-corner tl"></div>
+      <div class="cert-corner tr"></div>
+      <div class="cert-corner bl"></div>
+      <div class="cert-corner br"></div>
+
+      <p class="cert-eyebrow">Official Certificate of Involuntary Generosity</p>
+      <h2 class="cert-title">Certificate of Generosity</h2>
+      <div class="cert-divider"></div>
+
+      <div class="cert-body">
+        <p>This document certifies that the taxpayers of</p>
+        <p><strong style="font-family:'Playfair Display',serif;font-size:22px;" id="cert-state-name">[State]</strong></p>
+        <p>contributed approximately</p>
+        <div class="cert-amount" id="cert-amount-display">$0</div>
+        <p>more to the federal government than they received in FY 2023.<br>A portion of this surplus funded roads, schools, hospitals, and various infrastructure projects in states that could not cover their own costs.</p>
+      </div>
+
+      <p class="cert-fine-print">
+        Issued by the Adopt-A-State Taxpayer Awareness Initiative &bull; Data sourced from the Rockefeller Institute of Government &bull; 
+        No actual thankyou was issued by any recipient state or its representatives. This certificate is the thank you.
+      </p>
+
+      <div class="cert-seal">
+        Thank<br>You<br>For<br>Your<br>Service
+      </div>
+    </div>
+
+    <div class="cert-actions">
+      <button class="btn-download">📄 Download Certificate</button>
+      <button class="btn-share">🔗 Share on X</button>
+    </div>
+  </div>
+</section>
+
+<!-- INFRA CARDS -->
+<section class="infra-section">
+  <div class="section-header">
+    <p class="section-label" style="color:rgba(200,134,10,0.8)">Brought To You By</p>
+    <h2>Sponsored Infrastructure</h2>
+    <p class="sub">Real projects. Real federal dollars. Real states that did not write a thank you note.</p>
+  </div>
+  <div class="infra-grid">
+    <div class="infra-card">
+      <p class="sponsor-label">Sponsored By</p>
+      <p class="infra-name">Interstate 65 Expansion<br>Louisville, KY</p>
+      <p class="infra-detail">22 miles of highway resurfacing and bridge reinforcement. Funded in part through federal transportation grants redistributed from net contributor states.</p>
+      <span class="sponsor-tag">New York Taxpayers 🧡</span>
+    </div>
+    <div class="infra-card">
+      <p class="sponsor-label">Sponsored By</p>
+      <p class="infra-name">Medicaid Coverage<br>Jackson, MS</p>
+      <p class="infra-detail">Mississippi's federal Medicaid match rate is 77%, meaning the federal government covers $0.77 of every dollar spent. That federal government is funded by you.</p>
+      <span class="sponsor-tag">California Taxpayers 🧡</span>
+    </div>
+    <div class="infra-card">
+      <p class="sponsor-label">Sponsored By</p>
+      <p class="infra-name">Rural Broadband Initiative<br>Morgantown, WV</p>
+      <p class="infra-detail">$340M in federal broadband expansion funding allocated to West Virginia, a state that receives $2.07 for every dollar it sends to Washington.</p>
+      <span class="sponsor-tag">New Jersey Taxpayers 🧡</span>
+    </div>
+    <div class="infra-card">
+      <p class="sponsor-label">Sponsored By</p>
+      <p class="infra-name">Fort Rucker Military Base<br>Enterprise, AL</p>
+      <p class="infra-detail">One of Alabama's 21 military installations, collectively injecting $15.6B annually into the state's economy via federal defense spending. Fiscal conservatism, applied selectively.</p>
+      <span class="sponsor-tag">Illinois Taxpayers 🧡</span>
+    </div>
+    <div class="infra-card">
+      <p class="sponsor-label">Sponsored By</p>
+      <p class="infra-name">FEMA Hurricane Relief<br>Charleston, SC</p>
+      <p class="infra-detail">South Carolina received $2.3B in federal disaster relief between 2017-2023. FEMA does not charge co-pays. You absorb the difference. You're doing great.</p>
+      <span class="sponsor-tag">Massachusetts Taxpayers 🧡</span>
+    </div>
+    <div class="infra-card">
+      <p class="sponsor-label">Sponsored By</p>
+      <p class="infra-name">Permanent Fund Dividend<br>Juneau, AK</p>
+      <p class="infra-detail">Alaska pays residents up to $3,284/year simply for living there, funded in part by oil revenues and substantial federal transfers. The frontier provides for itself. Mostly.</p>
+      <span class="sponsor-tag">Colorado Taxpayers 🧡</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-logo">
+      <div class="logo">
+        <span class="logo-heart">🫶</span>
+        <div>
+          <span class="logo-text">Adopt-A-State</span>
+          <span class="logo-sub">A Taxpayer Awareness Initiative</span>
+        </div>
+      </div>
+      <p class="footer-tagline">They can't do it alone.<br>They never could.</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#">The States</a></li>
+          <li><a href="#">The Data</a></li>
+          <li><a href="#">Sponsored Infrastructure</a></li>
+          <li><a href="#">Certificate Generator</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Share</h4>
+        <ul>
+          <li><a href="#">Share on X</a></li>
+          <li><a href="#">Share on Instagram</a></li>
+          <li><a href="#">Download Assets</a></li>
+          <li><a href="#">Press Kit</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Data Sources</h4>
+        <ul>
+          <li><a href="#">Rockefeller Institute</a></li>
+          <li><a href="#">Tax Foundation</a></li>
+          <li><a href="#">USASpending.gov</a></li>
+          <li><a href="#">Methodology</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-disclaimer">
+      <em>Adopt-A-State</em> is a political satire and taxpayer awareness project. All financial figures are sourced from publicly available federal data. 
+      No state was harmed in the making of this website. Several may be embarrassed. That's different.
+      Not affiliated with any political party, candidate, or actual charity. Do not send us money. You've given enough.
+    </p>
+    <p style="font-size:12px;">© 2025 Adopt-A-State Initiative</p>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="state-flag" id="modal-flag">🌊</div>
+    <h3 id="modal-title">Mississippi</h3>
+    <p id="modal-amount" style="font-family:'Playfair Display',serif;font-size:22px;color:#b84040;margin:8px 0 16px;"></p>
+    <p id="modal-body"></p>
+    <p style="font-size:13px;color:#8a7a6a;font-style:italic;margin-top:16px;">
+      You did not opt into this. You did not have to. And yet, here we are. Together. Whether you like it or not.
+    </p>
+    <button class="modal-cta" onclick="closeModal()">Thank You For Your Service</button>
+  </div>
+</div>
+
+<script>
+  function openModal(name, flag, amount, body) {
+    document.getElementById('modal-flag').textContent = flag;
+    document.getElementById('modal-title').textContent = name;
+    document.getElementById('modal-amount').textContent = 'Net Federal Receipt: ' + amount;
+    document.getElementById('modal-body').textContent = body;
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+
+  function generateCert() {
+    const sel = document.getElementById('donor-state');
+    if (!sel.value) { alert('Please select your home state.'); return; }
+    const [stateName, amount] = sel.value.split('|');
+    document.getElementById('cert-state-name').textContent = stateName;
+    document.getElementById('cert-amount-display').textContent = amount;
+    const out = document.getElementById('certificate-output');
+    out.classList.add('visible');
+    out.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+</script>
+</body>
+</html>
