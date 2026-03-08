@@ -161,11 +161,6 @@
       background: rgba(200,134,10,0.07);
     }
 
-    .upload-zone.has-photo {
-      border-color: var(--amber);
-      padding: 12px;
-    }
-
     .upload-zone input[type="file"] {
       position: absolute;
       inset: 0;
@@ -190,15 +185,77 @@
       margin-top: 6px;
     }
 
-    #photo-preview {
+    /* CROP AREA */
+    .crop-area { display: none; }
+    .crop-area.visible { display: block; }
+
+    .crop-container {
       width: 100%;
-      height: 120px;
-      object-fit: cover;
-      display: none;
+      aspect-ratio: 1;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid var(--amber);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    .upload-zone.has-photo #photo-preview { display: block; }
-    .upload-zone.has-photo .upload-placeholder { display: none; }
+    .crop-container:active { cursor: grabbing; }
+
+    .crop-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+
+    .crop-mask {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background: radial-gradient(circle at center, transparent 45%, rgba(26,18,8,0.75) 45.5%);
+    }
+
+    .crop-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 90%; height: 90%;
+      transform: translate(-50%, -50%);
+      border: 2px solid rgba(200,134,10,0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .crop-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: rgba(244,239,228,0.4);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .change-photo-btn {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      background: transparent;
+      border: 1px solid rgba(244,239,228,0.15);
+      color: var(--amber);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .change-photo-btn:hover { border-color: var(--amber); }
 
     /* SELECT */
     select {
@@ -403,14 +460,26 @@
     <!-- PHOTO UPLOAD -->
     <div class="control-group">
       <label class="control-label">01 — Your Photo</label>
+
+      <!-- Upload placeholder (shown before photo is selected) -->
       <div class="upload-zone" id="upload-zone">
-        <input type="file" accept="image/*" id="photo-input" onchange="handlePhoto(event)"/>
+        <input type="file" accept="image/*" id="photo-input"/>
         <div class="upload-placeholder">
           <div class="upload-icon">📸</div>
           <p>Upload your photo<br>or selfie</p>
           <p class="upload-hint">Click to browse →</p>
         </div>
-        <img id="photo-preview" alt="Your photo"/>
+      </div>
+
+      <!-- Crop area (shown after photo is selected) -->
+      <div class="crop-area" id="crop-area">
+        <div class="crop-container" id="crop-container">
+          <img id="crop-image" alt="Your photo"/>
+          <div class="crop-mask"></div>
+          <div class="crop-ring"></div>
+        </div>
+        <p class="crop-hint">Drag to reposition · Scroll to zoom</p>
+        <button class="change-photo-btn" id="change-photo-btn">Change Photo</button>
       </div>
     </div>
 
@@ -492,44 +561,84 @@
   const states = {
     'mississippi': {
       name: 'Mississippi', emoji: '🌊', ratio: '$2.13', net: '$4.1B',
-      color: '#2a4a2a', accentColor: '#4a8a4a'
+      color: '#2a4a2a', accentColor: '#4a8a4a',
+      bgImages: {
+        bridge:   'https://images.unsplash.com/photo-1650216437764-2ed061f2ec4c?w=1080&fit=crop&q=80',
+        highway:  'https://images.unsplash.com/photo-1639538800276-55a6ad86607c?w=1080&fit=crop&q=80',
+        school:   'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=1080&fit=crop&q=80',
+        hospital: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1080&fit=crop&q=80'
+      }
     },
     'kentucky': {
       name: 'Kentucky', emoji: '🐎', ratio: '$2.41', net: '$22.9B',
-      color: '#4a2a2a', accentColor: '#8a4a4a'
+      color: '#4a2a2a', accentColor: '#8a4a4a',
+      bgImages: {
+        bridge:   'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=1080&fit=crop&q=80',
+        highway:  'https://images.unsplash.com/photo-1532201633958-497feb474315?w=1080&fit=crop&q=80',
+        school:   'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=1080&fit=crop&q=80',
+        hospital: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1080&fit=crop&q=80'
+      }
     },
     'west-virginia': {
       name: 'West Virginia', emoji: '⛰️', ratio: '$2.07', net: '$6.5B',
-      color: '#2a3a4a', accentColor: '#4a6a8a'
+      color: '#2a3a4a', accentColor: '#4a6a8a',
+      bgImages: {
+        bridge:   'https://images.unsplash.com/photo-1666214043271-c27f346d5a66?w=1080&fit=crop&q=80',
+        highway:  'https://images.unsplash.com/photo-1626457167858-59b98c2d7381?w=1080&fit=crop&q=80',
+        school:   'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=1080&fit=crop&q=80',
+        hospital: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1080&fit=crop&q=80'
+      }
     },
     'alabama': {
       name: 'Alabama', emoji: '🌺', ratio: '$1.99', net: '$10.2B',
-      color: '#4a2a3a', accentColor: '#8a4a6a'
+      color: '#4a2a3a', accentColor: '#8a4a6a',
+      bgImages: {
+        bridge:   'https://images.unsplash.com/photo-1644514236844-55afa80cb355?w=1080&fit=crop&q=80',
+        highway:  'https://images.unsplash.com/photo-1515704089429-fd06e6668458?w=1080&fit=crop&q=80',
+        school:   'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=1080&fit=crop&q=80',
+        hospital: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1080&fit=crop&q=80'
+      }
     },
     'south-carolina': {
       name: 'South Carolina', emoji: '🌴', ratio: '$1.71', net: '$7.9B',
-      color: '#3a4a2a', accentColor: '#6a8a4a'
+      color: '#3a4a2a', accentColor: '#6a8a4a',
+      bgImages: {
+        bridge:   'https://images.unsplash.com/photo-1657052203202-f24c647bcd21?w=1080&fit=crop&q=80',
+        highway:  'https://images.unsplash.com/photo-1639182608510-3dd870ed00fb?w=1080&fit=crop&q=80',
+        school:   'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=1080&fit=crop&q=80',
+        hospital: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1080&fit=crop&q=80'
+      }
     },
     'alaska': {
       name: 'Alaska', emoji: '🐻', ratio: '$1.84', net: '$5.1B',
-      color: '#1a2a3a', accentColor: '#2a4a6a'
+      color: '#1a2a3a', accentColor: '#2a4a6a',
+      bgImages: {
+        bridge:   'https://images.unsplash.com/photo-1503895987616-4abeca281797?w=1080&fit=crop&q=80',
+        highway:  'https://images.unsplash.com/photo-1531176175280-109affa5e82e?w=1080&fit=crop&q=80',
+        school:   'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=1080&fit=crop&q=80',
+        hospital: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1080&fit=crop&q=80'
+      }
     },
     'arkansas': {
       name: 'Arkansas', emoji: '🏞️', ratio: '$1.69', net: '$3.8B',
-      color: '#3a2a1a', accentColor: '#7a5a3a'
+      color: '#3a2a1a', accentColor: '#7a5a3a',
+      bgImages: {
+        bridge:   'https://images.unsplash.com/photo-1621302879828-a43aea3cb9fa?w=1080&fit=crop&q=80',
+        highway:  'https://images.unsplash.com/photo-1543257390-38f35773005f?w=1080&fit=crop&q=80',
+        school:   'https://images.unsplash.com/photo-1580541832626-2a7131ee809f?w=1080&fit=crop&q=80',
+        hospital: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1080&fit=crop&q=80'
+      }
     },
     'tennessee': {
       name: 'Tennessee', emoji: '🎸', ratio: '$1.47', net: '$5.6B',
-      color: '#2a1a3a', accentColor: '#5a3a7a'
+      color: '#2a1a3a', accentColor: '#5a3a7a',
+      bgImages: {
+        bridge:   'https://images.unsplash.com/photo-1545419913-775d25e71ebe?w=1080&fit=crop&q=80',
+        highway:  'https://images.unsplash.com/photo-1543257390-38f35773005f?w=1080&fit=crop&q=80',
+        school:   'https://images.unsplash.com/photo-1590412010786-bfd04240bbd0?w=1080&fit=crop&q=80',
+        hospital: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=1080&fit=crop&q=80'
+      }
     }
-  };
-
-  const cardStyles = {
-    bridge:   { label: 'Bridge',   scene: 'bridge' },
-    highway:  { label: 'Highway',  scene: 'highway' },
-    school:   { label: 'School',   scene: 'school' },
-    hospital: { label: 'Hospital', scene: 'hospital' },
-    receipt:  { label: 'Receipt',  scene: 'receipt' }
   };
 
   const captions = {
@@ -585,8 +694,35 @@
 
   let currentStyle = 'bridge';
   let currentTone = 'generous';
-  let userPhoto = null;
+  let userPhoto = null;  // data URL of uploaded photo
 
+  // ── CROP STATE ──
+  let cropScale = 1;
+  let cropX = 0;
+  let cropY = 0;
+  let cropBaseW = 0; // cover-fit base width
+  let cropBaseH = 0; // cover-fit base height
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let dragStartCropX = 0;
+  let dragStartCropY = 0;
+
+  // ── BG IMAGE CACHE ──
+  const bgImageCache = new Map();
+
+  function loadImage(url) {
+    if (bgImageCache.has(url)) return Promise.resolve(bgImageCache.get(url));
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => { bgImageCache.set(url, img); resolve(img); };
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = url;
+    });
+  }
+
+  // ── UI FUNCTIONS ──
   function setStyle(s, el) {
     currentStyle = s;
     document.querySelectorAll('.style-pills .pill').forEach(p => {
@@ -602,19 +738,6 @@
     });
     el.classList.add('active');
     updateCaption();
-  }
-
-  function handlePhoto(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = document.getElementById('photo-preview');
-      img.src = ev.target.result;
-      userPhoto = ev.target.result;
-      document.getElementById('upload-zone').classList.add('has-photo');
-    };
-    reader.readAsDataURL(file);
   }
 
   function updateCaption() {
@@ -638,6 +761,173 @@
     });
   }
 
+  // ── PHOTO UPLOAD & CROP ──
+  document.getElementById('photo-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      userPhoto = ev.target.result;
+      initCrop(userPhoto);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('change-photo-btn').addEventListener('click', function() {
+    // Reset and show upload zone again
+    document.getElementById('upload-zone').style.display = '';
+    document.getElementById('crop-area').classList.remove('visible');
+    userPhoto = null;
+    // Trigger file picker
+    const input = document.getElementById('photo-input');
+    input.value = '';
+    input.click();
+  });
+
+  function initCrop(src) {
+    const cropImg = document.getElementById('crop-image');
+    const container = document.getElementById('crop-container');
+
+    cropImg.onload = () => {
+      const cW = container.clientWidth;
+      const cH = container.clientHeight;
+      const imgAspect = cropImg.naturalWidth / cropImg.naturalHeight;
+      const containerAspect = cW / cH;
+
+      // Cover fit: image fills the container completely
+      if (imgAspect > containerAspect) {
+        cropBaseH = cH;
+        cropBaseW = cH * imgAspect;
+      } else {
+        cropBaseW = cW;
+        cropBaseH = cW / imgAspect;
+      }
+
+      cropScale = 1;
+      cropX = (cW - cropBaseW) / 2;
+      cropY = (cH - cropBaseH) / 2;
+      applyCropTransform();
+
+      // Show crop UI, hide upload zone
+      document.getElementById('upload-zone').style.display = 'none';
+      document.getElementById('crop-area').classList.add('visible');
+    };
+    cropImg.src = src;
+  }
+
+  function applyCropTransform() {
+    const img = document.getElementById('crop-image');
+    const w = cropBaseW * cropScale;
+    const h = cropBaseH * cropScale;
+    img.style.width = w + 'px';
+    img.style.height = h + 'px';
+    img.style.left = cropX + 'px';
+    img.style.top = cropY + 'px';
+  }
+
+  function clampCrop() {
+    const container = document.getElementById('crop-container');
+    const cW = container.clientWidth;
+    const cH = container.clientHeight;
+    const w = cropBaseW * cropScale;
+    const h = cropBaseH * cropScale;
+    // Don't let the image edge come inside the container
+    if (cropX > 0) cropX = 0;
+    if (cropY > 0) cropY = 0;
+    if (cropX < cW - w) cropX = cW - w;
+    if (cropY < cH - h) cropY = cH - h;
+  }
+
+  // Drag handlers
+  const cropContainer = document.getElementById('crop-container');
+
+  cropContainer.addEventListener('mousedown', startDrag);
+  cropContainer.addEventListener('touchstart', startDrag, { passive: false });
+
+  function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+    const pt = e.touches ? e.touches[0] : e;
+    dragStartX = pt.clientX;
+    dragStartY = pt.clientY;
+    dragStartCropX = cropX;
+    dragStartCropY = cropY;
+  }
+
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('touchmove', onDrag, { passive: false });
+
+  function onDrag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    const pt = e.touches ? e.touches[0] : e;
+    cropX = dragStartCropX + (pt.clientX - dragStartX);
+    cropY = dragStartCropY + (pt.clientY - dragStartY);
+    clampCrop();
+    applyCropTransform();
+  }
+
+  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('touchend', endDrag);
+
+  function endDrag() { isDragging = false; }
+
+  // Zoom via scroll
+  cropContainer.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    const container = document.getElementById('crop-container');
+    const rect = container.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    const oldScale = cropScale;
+    const delta = e.deltaY > 0 ? -0.08 : 0.08;
+    cropScale = Math.max(1, Math.min(4, cropScale + delta));
+
+    // Zoom toward mouse pointer
+    const ratio = cropScale / oldScale;
+    cropX = mx - ratio * (mx - cropX);
+    cropY = my - ratio * (my - cropY);
+
+    clampCrop();
+    applyCropTransform();
+  }, { passive: false });
+
+  // Pinch zoom for mobile
+  let lastPinchDist = 0;
+  cropContainer.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      lastPinchDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  }, { passive: false });
+
+  cropContainer.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const container = document.getElementById('crop-container');
+      const rect = container.getBoundingClientRect();
+      const cx = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
+      const cy = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
+
+      const oldScale = cropScale;
+      cropScale = Math.max(1, Math.min(4, cropScale * (dist / lastPinchDist)));
+      lastPinchDist = dist;
+
+      const ratio = cropScale / oldScale;
+      cropX = cx - ratio * (cx - cropX);
+      cropY = cy - ratio * (cy - cropY);
+      clampCrop();
+      applyCropTransform();
+    }
+  }, { passive: false });
+
   // ── CANVAS DRAWING ──
   function generateCard() {
     const stateKey = document.getElementById('state-select').value;
@@ -645,7 +935,7 @@
     if (!userPhoto) { alert('Please upload your photo first.'); return; }
 
     const btn = document.getElementById('gen-btn');
-    btn.textContent = 'Generating...';
+    btn.textContent = 'Loading...';
     btn.disabled = true;
 
     const canvas = document.getElementById('output-canvas');
@@ -657,11 +947,15 @@
     const state = states[stateKey];
 
     // Load user photo
-    const img = new Image();
-    img.onload = () => {
-      // Wait for fonts to load before drawing so canvas text renders correctly
-      document.fonts.ready.then(() => {
-        drawCard(ctx, W, H, state, img, stateKey);
+    const photoImg = new Image();
+    photoImg.onload = () => {
+      // Determine if we need a background image
+      const bgUrl = (currentStyle !== 'receipt') ? state.bgImages[currentStyle] : null;
+
+      const bgPromise = bgUrl ? loadImage(bgUrl).catch(() => null) : Promise.resolve(null);
+
+      Promise.all([bgPromise, document.fonts.ready]).then(([bgImg]) => {
+        drawCard(ctx, W, H, state, photoImg, stateKey, bgImg);
         document.getElementById('canvas-placeholder').style.display = 'none';
         canvas.style.display = 'block';
         document.getElementById('dl-btn').disabled = false;
@@ -670,10 +964,10 @@
         btn.disabled = false;
       });
     };
-    img.src = userPhoto;
+    photoImg.src = userPhoto;
   }
 
-  function drawCard(ctx, W, H, state, photo, stateKey) {
+  function drawCard(ctx, W, H, state, photo, stateKey, bgImg) {
     // ── BACKGROUND ──
     const bg = ctx.createLinearGradient(0, 0, W, H);
     bg.addColorStop(0, '#1a1208');
@@ -682,14 +976,28 @@
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
 
-    // ── SCENE ILLUSTRATION (drawn with canvas) ──
-    drawScene(ctx, W, H, state, currentStyle);
+    // ── SCENE: real photo or receipt grid ──
+    if (bgImg) {
+      // Draw background image cover-fit
+      const imgAspect = bgImg.width / bgImg.height;
+      let dw, dh, dx, dy;
+      if (imgAspect > 1) {
+        dh = H; dw = H * imgAspect;
+        dx = (W - dw) / 2; dy = 0;
+      } else {
+        dw = W; dh = W / imgAspect;
+        dx = 0; dy = (H - dh) / 2;
+      }
+      ctx.drawImage(bgImg, dx, dy, dw, dh);
+    } else if (currentStyle === 'receipt') {
+      drawReceiptScene(ctx, W, H);
+    }
 
     // ── DARK OVERLAY for readability ──
     const overlay = ctx.createLinearGradient(0, 0, 0, H);
-    overlay.addColorStop(0, 'rgba(15,10,4,0.3)');
-    overlay.addColorStop(0.5, 'rgba(15,10,4,0.15)');
-    overlay.addColorStop(1, 'rgba(15,10,4,0.85)');
+    overlay.addColorStop(0, 'rgba(15,10,4,0.4)');
+    overlay.addColorStop(0.4, 'rgba(15,10,4,0.3)');
+    overlay.addColorStop(1, 'rgba(15,10,4,0.9)');
     ctx.fillStyle = overlay;
     ctx.fillRect(0, 0, W, H);
 
@@ -717,19 +1025,32 @@
     ctx.fill();
     ctx.restore();
 
-    // Photo clip
+    // Photo clip — use crop values
     ctx.save();
     ctx.beginPath();
     ctx.arc(photoX, photoY, photoSize / 2, 0, Math.PI * 2);
     ctx.clip();
-    const aspect = photo.width / photo.height;
-    let sw, sh, sx, sy;
-    if (aspect > 1) {
-      sh = photoSize; sw = sh * aspect; sx = photoX - sw/2; sy = photoY - sh/2;
-    } else {
-      sw = photoSize; sh = sw / aspect; sx = photoX - sw/2; sy = photoY - sh/2;
-    }
-    ctx.drawImage(photo, sx, sy, sw, sh);
+
+    // Map crop preview to canvas
+    const container = document.getElementById('crop-container');
+    const cW = container.clientWidth || 280;
+    const cH = container.clientHeight || 280;
+    const displayW = cropBaseW * cropScale;
+    const displayH = cropBaseH * cropScale;
+
+    // The visible area in the preview is the full container (cW x cH)
+    // Map that to the original image coordinates
+    const scaleToNat = photo.naturalWidth / displayW;
+    const srcX = -cropX * scaleToNat;
+    const srcY = -cropY * scaleToNat;
+    const srcW = cW * scaleToNat;
+    const srcH = cH * scaleToNat;
+
+    // Draw into the clipped circle area
+    ctx.drawImage(photo,
+      srcX, srcY, srcW, srcH,
+      photoX - photoSize / 2, photoY - photoSize / 2, photoSize, photoSize
+    );
     ctx.restore();
 
     // Ring
@@ -802,9 +1123,8 @@
     ctx.textAlign = 'center';
     ctx.fillText('#AdoptAState  •  adoptastate.org', W / 2, H - 44);
 
-    // ── YOU'RE WELCOME RIBBON ──
+    // ── TONE TAGLINE ──
     ctx.save();
-    ctx.fillStyle = 'rgba(200,134,10,0.9)';
     ctx.font = 'italic bold 26px "Playfair Display", serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#c8860a';
@@ -833,127 +1153,9 @@
     return map[tone] || '';
   }
 
-  function drawScene(ctx, W, H, state, style) {
-    if (style === 'bridge') drawBridgeScene(ctx, W, H, state);
-    else if (style === 'highway') drawHighwayScene(ctx, W, H, state);
-    else if (style === 'school') drawSchoolScene(ctx, W, H, state);
-    else if (style === 'hospital') drawHospitalScene(ctx, W, H, state);
-    else if (style === 'receipt') drawReceiptScene(ctx, W, H, state);
-    else drawGenericScene(ctx, W, H, state);
-  }
-
-  function drawBridgeScene(ctx, W, H, state) {
-    // Sky gradient
-    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.65);
-    sky.addColorStop(0, '#0a1520');
-    sky.addColorStop(1, '#1a2a3a');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H * 0.65);
-
-    // Stars
-    for (let i = 0; i < 120; i++) {
-      const x = Math.random() * W;
-      const y = Math.random() * H * 0.5;
-      const r = Math.random() * 1.5;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(244,239,228,${Math.random() * 0.7 + 0.1})`;
-      ctx.fill();
-    }
-
-    // Water
-    const water = ctx.createLinearGradient(0, H * 0.6, 0, H);
-    water.addColorStop(0, '#0a1830');
-    water.addColorStop(1, '#050f1e');
-    ctx.fillStyle = water;
-    ctx.fillRect(0, H * 0.6, W, H * 0.4);
-
-    // Water shimmer
-    for (let i = 0; i < 8; i++) {
-      ctx.fillStyle = `rgba(100,150,255,${Math.random() * 0.06})`;
-      ctx.fillRect(0, H * 0.6 + i * 12, W, 4);
-    }
-
-    // Bridge towers
-    ctx.fillStyle = '#8a7050';
-    ctx.fillRect(W * 0.15, H * 0.25, 28, H * 0.45);
-    ctx.fillRect(W * 0.85 - 28, H * 0.25, 28, H * 0.45);
-
-    // Bridge cables
-    ctx.strokeStyle = 'rgba(180,150,90,0.5)';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 8; i++) {
-      ctx.beginPath();
-      ctx.moveTo(W * 0.15 + 14, H * 0.28);
-      ctx.lineTo(W * 0.15 + 14 + (W * 0.7 / 8) * i, H * 0.58);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(W * 0.85 - 14, H * 0.28);
-      ctx.lineTo(W * 0.85 - 14 - (W * 0.7 / 8) * i, H * 0.58);
-      ctx.stroke();
-    }
-
-    // Road deck
-    ctx.fillStyle = '#4a3a28';
-    ctx.fillRect(0, H * 0.57, W, 18);
-    ctx.fillStyle = '#3a2a1a';
-    ctx.fillRect(0, H * 0.57 + 6, W, 6);
-
-    // Ground
-    const ground = ctx.createLinearGradient(0, H * 0.62, 0, H);
-    ground.addColorStop(0, '#1a2010');
-    ground.addColorStop(1, '#0a1008');
-    ctx.fillStyle = ground;
-    ctx.fillRect(0, H * 0.62, W, H * 0.38);
-  }
-
-  function drawHighwayScene(ctx, W, H, state) {
-    // Sky
-    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.55);
-    sky.addColorStop(0, '#0e0a06');
-    sky.addColorStop(0.6, '#1a100a');
-    sky.addColorStop(1, '#2a180c');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H * 0.55);
-
-    // Sunset glow
-    const glow = ctx.createRadialGradient(W / 2, H * 0.4, 0, W / 2, H * 0.4, 400);
-    glow.addColorStop(0, 'rgba(200,100,20,0.3)');
-    glow.addColorStop(1, 'rgba(200,100,20,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H * 0.55);
-
-    // Road
-    const road = ctx.createLinearGradient(0, H * 0.4, 0, H);
-    road.addColorStop(0, '#2a2020');
-    road.addColorStop(1, '#1a1414');
-    ctx.fillStyle = road;
-    ctx.beginPath();
-    ctx.moveTo(W * 0.2, H * 0.5);
-    ctx.lineTo(W * 0.8, H * 0.5);
-    ctx.lineTo(W, H);
-    ctx.lineTo(0, H);
-    ctx.closePath();
-    ctx.fill();
-
-    // Dashes
-    ctx.fillStyle = '#c8860a';
-    ctx.fillRect(W * 0.49, H * 0.52, 12, 40);
-    ctx.fillRect(W * 0.49, H * 0.6, 16, 52);
-    ctx.fillRect(W * 0.47, H * 0.72, 22, 70);
-    ctx.fillRect(W * 0.45, H * 0.88, 30, 90);
-
-    // Shoulders
-    ctx.fillStyle = 'rgba(100,80,40,0.4)';
-    ctx.fillRect(0, H * 0.5, W * 0.2, H * 0.5);
-    ctx.fillRect(W * 0.8, H * 0.5, W * 0.2, H * 0.5);
-  }
-
-  function drawReceiptScene(ctx, W, H, state) {
+  function drawReceiptScene(ctx, W, H) {
     ctx.fillStyle = '#0e0c08';
     ctx.fillRect(0, 0, W, H);
-
-    // Grid lines
     ctx.strokeStyle = 'rgba(200,134,10,0.06)';
     ctx.lineWidth = 1;
     for (let i = 0; i < W; i += 60) {
@@ -962,118 +1164,6 @@
     for (let i = 0; i < H; i += 60) {
       ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(W, i); ctx.stroke();
     }
-  }
-
-  function drawSchoolScene(ctx, W, H, state) {
-    // Sky
-    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.55);
-    sky.addColorStop(0, '#1a1a2e');
-    sky.addColorStop(1, '#16213e');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H * 0.55);
-
-    // Ground
-    ctx.fillStyle = '#1a2a1a';
-    ctx.fillRect(0, H * 0.55, W, H * 0.45);
-
-    // School building
-    ctx.fillStyle = '#5a3020';
-    ctx.fillRect(W * 0.2, H * 0.3, W * 0.6, H * 0.28);
-
-    // Roof
-    ctx.fillStyle = '#3a1a10';
-    ctx.beginPath();
-    ctx.moveTo(W * 0.15, H * 0.3);
-    ctx.lineTo(W * 0.5, H * 0.18);
-    ctx.lineTo(W * 0.85, H * 0.3);
-    ctx.closePath();
-    ctx.fill();
-
-    // Windows (3 rows of 4)
-    ctx.fillStyle = 'rgba(200,170,80,0.5)';
-    for (let row = 0; row < 2; row++) {
-      for (let col = 0; col < 4; col++) {
-        const wx = W * 0.26 + col * (W * 0.13);
-        const wy = H * 0.34 + row * (H * 0.1);
-        ctx.fillRect(wx, wy, W * 0.08, H * 0.06);
-      }
-    }
-
-    // Door
-    ctx.fillStyle = '#2a1008';
-    ctx.fillRect(W * 0.46, H * 0.44, W * 0.08, H * 0.14);
-
-    // Flag pole
-    ctx.fillStyle = '#888';
-    ctx.fillRect(W * 0.75, H * 0.12, 3, H * 0.18);
-    ctx.fillStyle = 'rgba(180,60,60,0.7)';
-    ctx.fillRect(W * 0.75 + 3, H * 0.13, 30, 18);
-
-    // Path
-    ctx.fillStyle = 'rgba(150,140,120,0.3)';
-    ctx.beginPath();
-    ctx.moveTo(W * 0.44, H * 0.58);
-    ctx.lineTo(W * 0.56, H * 0.58);
-    ctx.lineTo(W * 0.6, H);
-    ctx.lineTo(W * 0.4, H);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  function drawHospitalScene(ctx, W, H, state) {
-    // Sky
-    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.5);
-    sky.addColorStop(0, '#0a0a1a');
-    sky.addColorStop(1, '#1a1a30');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H * 0.5);
-
-    // Ground
-    ctx.fillStyle = '#141418';
-    ctx.fillRect(0, H * 0.5, W, H * 0.5);
-
-    // Hospital building
-    ctx.fillStyle = '#2a2a3a';
-    ctx.fillRect(W * 0.2, H * 0.22, W * 0.6, H * 0.32);
-
-    // Floors / windows
-    for (let row = 0; row < 4; row++) {
-      for (let col = 0; col < 6; col++) {
-        const lit = Math.random() > 0.3;
-        ctx.fillStyle = lit ? 'rgba(200,200,180,0.5)' : 'rgba(100,100,120,0.2)';
-        const wx = W * 0.24 + col * (W * 0.088);
-        const wy = H * 0.25 + row * (H * 0.07);
-        ctx.fillRect(wx, wy, W * 0.055, H * 0.04);
-      }
-    }
-
-    // Red cross
-    ctx.fillStyle = 'rgba(200,50,50,0.8)';
-    ctx.fillRect(W * 0.47, H * 0.14, W * 0.06, H * 0.1);
-    ctx.fillRect(W * 0.45, H * 0.17, W * 0.1, H * 0.04);
-
-    // Emergency entrance
-    ctx.fillStyle = 'rgba(200,50,50,0.3)';
-    ctx.fillRect(W * 0.38, H * 0.48, W * 0.24, H * 0.06);
-
-    // Parking lot lines
-    ctx.strokeStyle = 'rgba(200,200,200,0.1)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 8; i++) {
-      const lx = W * 0.25 + i * (W * 0.065);
-      ctx.beginPath();
-      ctx.moveTo(lx, H * 0.6);
-      ctx.lineTo(lx, H * 0.7);
-      ctx.stroke();
-    }
-  }
-
-  function drawGenericScene(ctx, W, H, state) {
-    const bg = ctx.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, '#0e0c06');
-    bg.addColorStop(1, '#1a1208');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
   }
 
   function downloadCard() {
