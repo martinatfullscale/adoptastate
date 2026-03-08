@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Adopt-A-State | Make Your Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #f4efe4;
+      --dark: #1a1208;
+      --amber: #c8860a;
+      --amber-light: #f5a623;
+      --red: #b84040;
+      --blue: #2a4a7a;
+      --muted: #7a6a54;
+      --border: #d8cfc0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'Source Serif 4', Georgia, serif;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid rgba(200,134,10,0.2);
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    .logo-sub {
+      font-size: 9px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--amber);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .header-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--amber);
+      letter-spacing: 1px;
+      border: 1px solid rgba(200,134,10,0.4);
+      padding: 6px 14px;
+    }
+
+    /* HERO TEXT */
+    .page-hero {
+      text-align: center;
+      padding: 60px 40px 40px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .page-hero .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 16px;
+    }
+
+    .page-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .page-hero h1 em {
+      font-style: italic;
+      color: var(--amber);
+    }
+
+    .page-hero p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: rgba(244,239,228,0.65);
+      font-weight: 300;
+    }
+
+    /* MAIN LAYOUT */
+    .builder {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 2px;
+      max-width: 1200px;
+      margin: 40px auto 80px;
+      padding: 0 20px;
+      align-items: start;
+    }
+
+    /* CONTROLS PANEL */
+    .controls {
+      background: rgba(244,239,228,0.04);
+      border: 1px solid rgba(244,239,228,0.08);
+      padding: 36px;
+    }
+
+    .controls-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(244,239,228,0.08);
+    }
+
+    .control-group {
+      margin-bottom: 28px;
+    }
+
+    .control-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(244,239,228,0.5);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* PHOTO UPLOAD */
+    .upload-zone {
+      border: 1px dashed rgba(200,134,10,0.4);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      background: rgba(200,134,10,0.03);
+    }
+
+    .upload-zone:hover {
+      border-color: var(--amber);
+      background: rgba(200,134,10,0.07);
+    }
+
+    .upload-zone.has-photo {
+      border-color: var(--amber);
+      padding: 12px;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon { font-size: 28px; margin-bottom: 8px; }
+
+    .upload-zone p {
+      font-size: 12px;
+      color: rgba(244,239,228,0.5);
+      line-height: 1.5;
+    }
+
+    .upload-zone .upload-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--amber);
+      margin-top: 6px;
+    }
+
+    #photo-preview {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: none;
+    }
+
+    .upload-zone.has-photo #photo-preview { display: block; }
+    .upload-zone.has-photo .upload-placeholder { display: none; }
+
+    /* SELECT */
+    select {
+      width: 100%;
+      background: rgba(244,239,228,0.05);
+      border: 1px solid rgba(244,239,228,0.15);
+      color: var(--cream);
+      font-family: 'Source Serif 4', serif;
+      font-size: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c8860a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    select option { background: #2a1e0a; color: var(--cream); }
+
+    select:focus { outline: none; border-color: var(--amber); }
+
+    /* STYLE PILLS */
+    .style-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 8px 14px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid rgba(244,239,228,0.15);
+      color: rgba(244,239,228,0.5);
+      cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      transition: all 0.15s;
+      background: transparent;
+    }
+
+    .pill:hover { border-color: var(--amber); color: var(--amber); }
+    .pill.active { border-color: var(--amber); color: var(--amber); background: rgba(200,134,10,0.1); }
+
+    /* GENERATE BUTTON */
+    .generate-btn {
+      width: 100%;
+      background: var(--amber);
+      color: var(--dark);
+      border: none;
+      padding: 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+      font-weight: 500;
+    }
+
+    .generate-btn:hover { background: var(--amber-light); }
+    .generate-btn:disabled { background: rgba(200,134,10,0.3); cursor: not-allowed; }
+
+    /* CANVAS PANEL */
+    .canvas-panel {
+      background: rgba(244,239,228,0.02);
+      border: 1px solid rgba(244,239,228,0.08);
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 540px;
+    }
+
+    #output-canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid rgba(244,239,228,0.1);
+    }
+
+    .canvas-placeholder {
+      width: 100%;
+      aspect-ratio: 1;
+      background: rgba(244,239,228,0.03);
+      border: 1px dashed rgba(244,239,228,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: rgba(244,239,228,0.25);
+      font-size: 14px;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .canvas-placeholder .placeholder-icon { font-size: 48px; opacity: 0.4; }
+
+    /* DOWNLOAD BUTTONS */
+    .download-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 540px;
+    }
+
+    .dl-btn {
+      flex: 1;
+      padding: 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .dl-primary {
+      background: var(--cream);
+      color: var(--dark);
+    }
+
+    .dl-primary:hover { background: white; }
+
+    .dl-secondary {
+      background: transparent;
+      border: 1px solid rgba(244,239,228,0.2);
+      color: var(--cream);
+    }
+
+    .dl-secondary:hover { border-color: var(--amber); color: var(--amber); }
+
+    .dl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* CAPTION AREA */
+    .caption-preview {
+      width: 100%;
+      max-width: 540px;
+      background: rgba(244,239,228,0.04);
+      border: 1px solid rgba(244,239,228,0.08);
+      padding: 20px;
+    }
+
+    .caption-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 10px;
+    }
+
+    #caption-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(244,239,228,0.75);
+      font-style: italic;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 800px) {
+      .builder { grid-template-columns: 1fr; }
+      header { padding: 16px 20px; }
+      .page-hero { padding: 40px 20px 30px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    <div>
+      <span class="logo-text">🫶 Adopt-A-State</span>
+      <span class="logo-sub">Taxpayer Awareness Initiative</span>
+    </div>
+  </a>
+  <div class="header-tag">// Card Generator</div>
+</header>
+
+<div class="page-hero">
+  <p class="eyebrow">Make Your Card</p>
+  <h1>Show them your<br><em>involuntary generosity.</em></h1>
+  <p>Upload your photo, pick a state, and get a shareable image card. Post it. Let them know. They certainly won't thank you themselves.</p>
+</div>
+
+<div class="builder">
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <p class="controls-title">// Build Your Card</p>
+
+    <!-- PHOTO UPLOAD -->
+    <div class="control-group">
+      <label class="control-label">01 — Your Photo</label>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" accept="image/*" id="photo-input" onchange="handlePhoto(event)"/>
+        <div class="upload-placeholder">
+          <div class="upload-icon">📸</div>
+          <p>Upload your photo<br>or selfie</p>
+          <p class="upload-hint">Click to browse →</p>
+        </div>
+        <img id="photo-preview" alt="Your photo"/>
+      </div>
+    </div>
+
+    <!-- STATE SELECT -->
+    <div class="control-group">
+      <label class="control-label">02 — Pick a State to Roast</label>
+      <select id="state-select" onchange="updateCaption()">
+        <option value="">Select a state...</option>
+        <option value="mississippi">🌊 Mississippi ($2.13 per $1)</option>
+        <option value="kentucky">🐎 Kentucky ($2.41 per $1)</option>
+        <option value="west-virginia">⛰️ West Virginia ($2.07 per $1)</option>
+        <option value="alabama">🌺 Alabama ($1.99 per $1)</option>
+        <option value="south-carolina">🌴 South Carolina ($1.71 per $1)</option>
+        <option value="alaska">🐻 Alaska ($1.84 per $1)</option>
+        <option value="arkansas">🏞️ Arkansas ($1.69 per $1)</option>
+        <option value="tennessee">🎸 Tennessee ($1.47 per $1)</option>
+      </select>
+    </div>
+
+    <!-- CARD STYLE -->
+    <div class="control-group">
+      <label class="control-label">03 — Card Style</label>
+      <div class="style-pills">
+        <button class="pill active" onclick="setStyle('bridge', this)">🌉 Bridge</button>
+        <button class="pill" onclick="setStyle('highway', this)">🛣️ Highway</button>
+        <button class="pill" onclick="setStyle('school', this)">🏫 School</button>
+        <button class="pill" onclick="setStyle('hospital', this)">🏥 Hospital</button>
+        <button class="pill" onclick="setStyle('receipt', this)">🧾 Receipt</button>
+      </div>
+    </div>
+
+    <!-- TONE -->
+    <div class="control-group">
+      <label class="control-label">04 — Tone</label>
+      <div class="style-pills">
+        <button class="pill active" onclick="setTone('generous', this)">😇 Generous</button>
+        <button class="pill" onclick="setTone('petty', this)">😤 Petty</button>
+        <button class="pill" onclick="setTone('formal', this)">🎩 Formal</button>
+        <button class="pill" onclick="setTone('tired', this)">😮‍💨 Tired</button>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="gen-btn" onclick="generateCard()">
+      Generate My Card →
+    </button>
+  </div>
+
+  <!-- CANVAS OUTPUT -->
+  <div class="canvas-panel">
+
+    <div class="canvas-wrap">
+      <div class="canvas-placeholder" id="canvas-placeholder">
+        <div class="placeholder-icon">🖼️</div>
+        <p>Your shareable card<br>will appear here</p>
+        <p style="font-size:12px;color:rgba(244,239,228,0.15);margin-top:8px;">Upload a photo and select a state to begin</p>
+      </div>
+      <canvas id="output-canvas" width="1080" height="1080" style="display:none;"></canvas>
+    </div>
+
+    <div class="download-actions">
+      <button class="dl-btn dl-primary" id="dl-btn" onclick="downloadCard()" disabled>
+        ⬇ Download Card
+      </button>
+      <button class="dl-btn dl-secondary" id="copy-caption-btn" onclick="copyCaption()" disabled>
+        Copy Caption
+      </button>
+    </div>
+
+    <div class="caption-preview">
+      <p class="caption-label">// Suggested Caption</p>
+      <p id="caption-text">Select a state to see your suggested caption.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── STATE DATA ──
+  const states = {
+    'mississippi': {
+      name: 'Mississippi', emoji: '🌊', ratio: '$2.13', net: '$4.1B',
+      color: '#2a4a2a', accentColor: '#4a8a4a'
+    },
+    'kentucky': {
+      name: 'Kentucky', emoji: '🐎', ratio: '$2.41', net: '$22.9B',
+      color: '#4a2a2a', accentColor: '#8a4a4a'
+    },
+    'west-virginia': {
+      name: 'West Virginia', emoji: '⛰️', ratio: '$2.07', net: '$6.5B',
+      color: '#2a3a4a', accentColor: '#4a6a8a'
+    },
+    'alabama': {
+      name: 'Alabama', emoji: '🌺', ratio: '$1.99', net: '$10.2B',
+      color: '#4a2a3a', accentColor: '#8a4a6a'
+    },
+    'south-carolina': {
+      name: 'South Carolina', emoji: '🌴', ratio: '$1.71', net: '$7.9B',
+      color: '#3a4a2a', accentColor: '#6a8a4a'
+    },
+    'alaska': {
+      name: 'Alaska', emoji: '🐻', ratio: '$1.84', net: '$5.1B',
+      color: '#1a2a3a', accentColor: '#2a4a6a'
+    },
+    'arkansas': {
+      name: 'Arkansas', emoji: '🏞️', ratio: '$1.69', net: '$3.8B',
+      color: '#3a2a1a', accentColor: '#7a5a3a'
+    },
+    'tennessee': {
+      name: 'Tennessee', emoji: '🎸', ratio: '$1.47', net: '$5.6B',
+      color: '#2a1a3a', accentColor: '#5a3a7a'
+    }
+  };
+
+  const cardStyles = {
+    bridge:   { label: 'Bridge',   scene: 'bridge' },
+    highway:  { label: 'Highway',  scene: 'highway' },
+    school:   { label: 'School',   scene: 'school' },
+    hospital: { label: 'Hospital', scene: 'hospital' },
+    receipt:  { label: 'Receipt',  scene: 'receipt' }
+  };
+
+  const captions = {
+    mississippi: {
+      generous: "My tax dollars helped keep Mississippi running this year. Roads, schools, hospitals — you're welcome. 🫶 #AdoptAState",
+      petty:     "Mississippi gets $2.13 back for every $1 it sends. I'm basically their sugar daddy and they don't even know my name. 😤 #AdoptAState",
+      formal:    "As a net contributor to the federal system, I wish to formally acknowledge my ongoing support of Mississippi's infrastructure. 🎩 #AdoptAState",
+      tired:     "Another year of subsidizing states that lecture me about self-reliance. I'm fine. Everything is fine. 😮‍💨 #AdoptAState"
+    },
+    kentucky: {
+      generous: "Kentucky receives $2.41 for every dollar it contributes. Just happy to help. 🫶 #AdoptAState",
+      petty:    "Kentucky: #1 in federal dependency, #1 in opinions about government spending. I funded both. 😤 #AdoptAState",
+      formal:   "I hereby confirm my involuntary financial support of the Commonwealth of Kentucky for fiscal year 2023. 🎩 #AdoptAState",
+      tired:    "I've funded Kentucky's infrastructure longer than most of their politicians have been in office. 😮‍💨 #AdoptAState"
+    },
+    'west-virginia': {
+      generous: "Almost Heaven, fully funded. Happy to help, West Virginia. 🫶 #AdoptAState",
+      petty:    "West Virginia gets $2.07 back per dollar. Country roads, my money, their commute. 😤 #AdoptAState",
+      formal:   "My federal tax contributions have materially supported West Virginia's infrastructure for multiple consecutive fiscal years. 🎩 #AdoptAState",
+      tired:    "Still funding West Virginia. Still haven't heard back. It's fine. 😮‍💨 #AdoptAState"
+    },
+    alabama: {
+      generous: "Alabama gets $1.99 back for every dollar contributed. Roll Tide, I guess. 🫶 #AdoptAState",
+      petty:    "Alabama: deeply committed to fiscal conservatism and also to receiving $10 billion more than it gives. 😤 #AdoptAState",
+      formal:   "I have been a consistent financial contributor to the state of Alabama's federally-dependent infrastructure. 🎩 #AdoptAState",
+      tired:    "Funded I-65. Built their bridges. Haven't gotten a single thank you text. 😮‍💨 #AdoptAState"
+    },
+    'south-carolina': {
+      generous: "Smiling faces, balanced by mine. Happy to support South Carolina. 🫶 #AdoptAState",
+      petty:    "South Carolina believes in pulling itself up by its bootstraps. The bootstraps were federally subsidized. 😤 #AdoptAState",
+      formal:   "My tax contributions have provided meaningful support to South Carolina's Medicaid and infrastructure programs. 🎩 #AdoptAState",
+      tired:    "The beaches are beautiful. They should be — I helped pay for the roads that lead to them. 😮‍💨 #AdoptAState"
+    },
+    alaska: {
+      generous: "Alaska pays people to live there AND receives $1.84 per $1 given. I helped fund both. You're welcome. 🫶 #AdoptAState",
+      petty:    "Alaska: receives more federal money per capita than almost anyone AND pays residents a dividend. Rugged individualism, defined. 😤 #AdoptAState",
+      formal:   "I have contributed materially to Alaska's federal subsidy program for multiple consecutive fiscal years. 🎩 #AdoptAState",
+      tired:    "Alaska gets a check for existing and I get... a cold. 😮‍💨 #AdoptAState"
+    },
+    arkansas: {
+      generous: "Arkansas gets $1.69 back per dollar. Just happy to help. 🫶 #AdoptAState",
+      petty:    "Funded Arkansas's infrastructure again this year. As one does. 😤 #AdoptAState",
+      formal:   "My federal contributions continue to support the state of Arkansas in maintaining its public services. 🎩 #AdoptAState",
+      tired:    "Arkansas. Still going. Still funded. Still not a word. 😮‍💨 #AdoptAState"
+    },
+    tennessee: {
+      generous: "Tennessee gets $1.47 back per dollar. Happy to keep the music playing. 🫶 #AdoptAState",
+      petty:    "Tennessee: where the music is free and the infrastructure is subsidized by me. 😤 #AdoptAState",
+      formal:   "I acknowledge my ongoing financial contribution to the state of Tennessee's federally supported programs. 🎩 #AdoptAState",
+      tired:    "Funded Tennessee for years. Never once been thanked on the radio. 😮‍💨 #AdoptAState"
+    }
+  };
+
+  let currentStyle = 'bridge';
+  let currentTone = 'generous';
+  let userPhoto = null;
+
+  function setStyle(s, el) {
+    currentStyle = s;
+    document.querySelectorAll('.style-pills .pill').forEach(p => {
+      if (p.closest('.control-group') === el.closest('.control-group')) p.classList.remove('active');
+    });
+    el.classList.add('active');
+  }
+
+  function setTone(t, el) {
+    currentTone = t;
+    document.querySelectorAll('.style-pills .pill').forEach(p => {
+      if (p.closest('.control-group') === el.closest('.control-group')) p.classList.remove('active');
+    });
+    el.classList.add('active');
+    updateCaption();
+  }
+
+  function handlePhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = document.getElementById('photo-preview');
+      img.src = ev.target.result;
+      userPhoto = ev.target.result;
+      document.getElementById('upload-zone').classList.add('has-photo');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updateCaption() {
+    const stateKey = document.getElementById('state-select').value;
+    const el = document.getElementById('caption-text');
+    if (!stateKey) {
+      el.textContent = 'Select a state to see your suggested caption.';
+      return;
+    }
+    el.textContent = captions[stateKey]?.[currentTone] || '';
+    document.getElementById('copy-caption-btn').disabled = false;
+  }
+
+  function copyCaption() {
+    const text = document.getElementById('caption-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-caption-btn');
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  }
+
+  // ── CANVAS DRAWING ──
+  function generateCard() {
+    const stateKey = document.getElementById('state-select').value;
+    if (!stateKey) { alert('Please select a state first.'); return; }
+    if (!userPhoto) { alert('Please upload your photo first.'); return; }
+
+    const btn = document.getElementById('gen-btn');
+    btn.textContent = 'Generating...';
+    btn.disabled = true;
+
+    const canvas = document.getElementById('output-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = 1080, H = 1080;
+    canvas.width = W;
+    canvas.height = H;
+
+    const state = states[stateKey];
+
+    // Load user photo
+    const img = new Image();
+    img.onload = () => {
+      drawCard(ctx, W, H, state, img, stateKey);
+      document.getElementById('canvas-placeholder').style.display = 'none';
+      canvas.style.display = 'block';
+      document.getElementById('dl-btn').disabled = false;
+      document.getElementById('copy-caption-btn').disabled = false;
+      btn.textContent = 'Regenerate Card →';
+      btn.disabled = false;
+    };
+    img.src = userPhoto;
+  }
+
+  function drawCard(ctx, W, H, state, photo, stateKey) {
+    // ── BACKGROUND ──
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#1a1208');
+    bg.addColorStop(0.5, '#0e0c06');
+    bg.addColorStop(1, '#1a1208');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── SCENE ILLUSTRATION (drawn with canvas) ──
+    drawScene(ctx, W, H, state, currentStyle);
+
+    // ── DARK OVERLAY for readability ──
+    const overlay = ctx.createLinearGradient(0, 0, 0, H);
+    overlay.addColorStop(0, 'rgba(15,10,4,0.3)');
+    overlay.addColorStop(0.5, 'rgba(15,10,4,0.15)');
+    overlay.addColorStop(1, 'rgba(15,10,4,0.85)');
+    ctx.fillStyle = overlay;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── GRAIN TEXTURE ──
+    for (let i = 0; i < 8000; i++) {
+      const x = Math.random() * W;
+      const y = Math.random() * H;
+      const a = Math.random() * 0.03;
+      ctx.fillStyle = `rgba(244,239,228,${a})`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+
+    // ── PHOTO CIRCLE ──
+    const photoSize = 240;
+    const photoX = W / 2;
+    const photoY = H * 0.38;
+
+    // Shadow
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 40;
+    ctx.beginPath();
+    ctx.arc(photoX, photoY, photoSize / 2 + 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#c8860a';
+    ctx.fill();
+    ctx.restore();
+
+    // Photo clip
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(photoX, photoY, photoSize / 2, 0, Math.PI * 2);
+    ctx.clip();
+    const aspect = photo.width / photo.height;
+    let sw, sh, sx, sy;
+    if (aspect > 1) {
+      sh = photoSize; sw = sh * aspect; sx = photoX - sw/2; sy = photoY - sh/2;
+    } else {
+      sw = photoSize; sh = sw / aspect; sx = photoX - sw/2; sy = photoY - sh/2;
+    }
+    ctx.drawImage(photo, sx, sy, sw, sh);
+    ctx.restore();
+
+    // Ring
+    ctx.beginPath();
+    ctx.arc(photoX, photoY, photoSize / 2 + 4, 0, Math.PI * 2);
+    ctx.strokeStyle = '#c8860a';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // ── TOP EYEBROW ──
+    ctx.fillStyle = '#c8860a';
+    ctx.font = '500 22px "DM Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '4px';
+    ctx.fillText('ADOPT-A-STATE', W / 2, 72);
+
+    // Thin line
+    ctx.fillStyle = 'rgba(200,134,10,0.3)';
+    ctx.fillRect(W/2 - 160, 88, 320, 1);
+
+    // ── STATE EMOJI & BADGE ──
+    ctx.font = '56px serif';
+    ctx.fillText(state.emoji, W / 2, photoY - photoSize / 2 - 36);
+
+    // ── MAIN TEXT ──
+    ctx.fillStyle = '#f4efe4';
+    ctx.font = 'bold 62px "Playfair Display", Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('I funded', W / 2, H * 0.62);
+
+    // State name in amber
+    ctx.fillStyle = '#c8860a';
+    ctx.font = 'bold 72px "Playfair Display", Georgia, serif';
+    ctx.fillText(state.name.toUpperCase(), W / 2, H * 0.62 + 82);
+
+    // Subtitle
+    ctx.fillStyle = 'rgba(244,239,228,0.6)';
+    ctx.font = '300 30px "Source Serif 4", Georgia, serif';
+    ctx.fillText(sceneLabel(currentStyle, state.name), W / 2, H * 0.62 + 136);
+
+    // ── STATS BOX ──
+    const boxW = 520, boxH = 90;
+    const boxX = W / 2 - boxW / 2;
+    const boxY = H * 0.62 + 168;
+
+    ctx.fillStyle = 'rgba(200,134,10,0.12)';
+    ctx.strokeStyle = 'rgba(200,134,10,0.35)';
+    ctx.lineWidth = 1;
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+    // Stats text
+    ctx.fillStyle = '#c8860a';
+    ctx.font = 'bold 36px "Playfair Display", serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(state.ratio, boxX + boxW * 0.28, boxY + 38);
+    ctx.fillText(state.net, boxX + boxW * 0.72, boxY + 38);
+
+    ctx.fillStyle = 'rgba(244,239,228,0.4)';
+    ctx.font = '500 17px "DM Mono", monospace';
+    ctx.fillText('received per $1', boxX + boxW * 0.28, boxY + 68);
+    ctx.fillText('net received', boxX + boxW * 0.72, boxY + 68);
+
+    // Divider
+    ctx.fillStyle = 'rgba(200,134,10,0.25)';
+    ctx.fillRect(boxX + boxW / 2 - 0.5, boxY + 12, 1, boxH - 24);
+
+    // ── BOTTOM TAG ──
+    ctx.fillStyle = 'rgba(244,239,228,0.25)';
+    ctx.font = '500 20px "DM Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('#AdoptAState  •  adoptastate.org', W / 2, H - 44);
+
+    // ── YOU'RE WELCOME RIBBON ──
+    ctx.save();
+    ctx.fillStyle = 'rgba(200,134,10,0.9)';
+    ctx.font = 'italic bold 26px "Playfair Display", serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#c8860a';
+    ctx.fillText(toneTagline(currentTone), W / 2, H - 82);
+    ctx.restore();
+  }
+
+  function sceneLabel(style, stateName) {
+    const map = {
+      bridge:   `and the bridges of ${stateName}`,
+      highway:  `and the highways of ${stateName}`,
+      school:   `and the schools of ${stateName}`,
+      hospital: `and the hospitals of ${stateName}`,
+      receipt:  `Here is your receipt, ${stateName}`
+    };
+    return map[style] || `and the infrastructure of ${stateName}`;
+  }
+
+  function toneTagline(tone) {
+    const map = {
+      generous: 'You\'re welcome. Truly.',
+      petty:    'A thank you would be nice.',
+      formal:   'Issued with regards.',
+      tired:    'As always. Sigh.'
+    };
+    return map[tone] || '';
+  }
+
+  function drawScene(ctx, W, H, state, style) {
+    if (style === 'bridge') drawBridgeScene(ctx, W, H, state);
+    else if (style === 'highway') drawHighwayScene(ctx, W, H, state);
+    else if (style === 'receipt') drawReceiptScene(ctx, W, H, state);
+    else drawGenericScene(ctx, W, H, state);
+  }
+
+  function drawBridgeScene(ctx, W, H, state) {
+    // Sky gradient
+    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.65);
+    sky.addColorStop(0, '#0a1520');
+    sky.addColorStop(1, '#1a2a3a');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H * 0.65);
+
+    // Stars
+    for (let i = 0; i < 120; i++) {
+      const x = Math.random() * W;
+      const y = Math.random() * H * 0.5;
+      const r = Math.random() * 1.5;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(244,239,228,${Math.random() * 0.7 + 0.1})`;
+      ctx.fill();
+    }
+
+    // Water
+    const water = ctx.createLinearGradient(0, H * 0.6, 0, H);
+    water.addColorStop(0, '#0a1830');
+    water.addColorStop(1, '#050f1e');
+    ctx.fillStyle = water;
+    ctx.fillRect(0, H * 0.6, W, H * 0.4);
+
+    // Water shimmer
+    for (let i = 0; i < 8; i++) {
+      ctx.fillStyle = `rgba(100,150,255,${Math.random() * 0.06})`;
+      ctx.fillRect(0, H * 0.6 + i * 12, W, 4);
+    }
+
+    // Bridge towers
+    ctx.fillStyle = '#8a7050';
+    ctx.fillRect(W * 0.15, H * 0.25, 28, H * 0.45);
+    ctx.fillRect(W * 0.85 - 28, H * 0.25, 28, H * 0.45);
+
+    // Bridge cables
+    ctx.strokeStyle = 'rgba(180,150,90,0.5)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 8; i++) {
+      ctx.beginPath();
+      ctx.moveTo(W * 0.15 + 14, H * 0.28);
+      ctx.lineTo(W * 0.15 + 14 + (W * 0.7 / 8) * i, H * 0.58);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(W * 0.85 - 14, H * 0.28);
+      ctx.lineTo(W * 0.85 - 14 - (W * 0.7 / 8) * i, H * 0.58);
+      ctx.stroke();
+    }
+
+    // Road deck
+    ctx.fillStyle = '#4a3a28';
+    ctx.fillRect(0, H * 0.57, W, 18);
+    ctx.fillStyle = '#3a2a1a';
+    ctx.fillRect(0, H * 0.57 + 6, W, 6);
+
+    // Ground
+    const ground = ctx.createLinearGradient(0, H * 0.62, 0, H);
+    ground.addColorStop(0, '#1a2010');
+    ground.addColorStop(1, '#0a1008');
+    ctx.fillStyle = ground;
+    ctx.fillRect(0, H * 0.62, W, H * 0.38);
+  }
+
+  function drawHighwayScene(ctx, W, H, state) {
+    // Sky
+    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.55);
+    sky.addColorStop(0, '#0e0a06');
+    sky.addColorStop(0.6, '#1a100a');
+    sky.addColorStop(1, '#2a180c');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H * 0.55);
+
+    // Sunset glow
+    const glow = ctx.createRadialGradient(W / 2, H * 0.4, 0, W / 2, H * 0.4, 400);
+    glow.addColorStop(0, 'rgba(200,100,20,0.3)');
+    glow.addColorStop(1, 'rgba(200,100,20,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H * 0.55);
+
+    // Road
+    const road = ctx.createLinearGradient(0, H * 0.4, 0, H);
+    road.addColorStop(0, '#2a2020');
+    road.addColorStop(1, '#1a1414');
+    ctx.fillStyle = road;
+    ctx.beginPath();
+    ctx.moveTo(W * 0.2, H * 0.5);
+    ctx.lineTo(W * 0.8, H * 0.5);
+    ctx.lineTo(W, H);
+    ctx.lineTo(0, H);
+    ctx.closePath();
+    ctx.fill();
+
+    // Dashes
+    ctx.fillStyle = '#c8860a';
+    ctx.fillRect(W * 0.49, H * 0.52, 12, 40);
+    ctx.fillRect(W * 0.49, H * 0.6, 16, 52);
+    ctx.fillRect(W * 0.47, H * 0.72, 22, 70);
+    ctx.fillRect(W * 0.45, H * 0.88, 30, 90);
+
+    // Shoulders
+    ctx.fillStyle = 'rgba(100,80,40,0.4)';
+    ctx.fillRect(0, H * 0.5, W * 0.2, H * 0.5);
+    ctx.fillRect(W * 0.8, H * 0.5, W * 0.2, H * 0.5);
+  }
+
+  function drawReceiptScene(ctx, W, H, state) {
+    ctx.fillStyle = '#0e0c08';
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(200,134,10,0.06)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < W; i += 60) {
+      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, H); ctx.stroke();
+    }
+    for (let i = 0; i < H; i += 60) {
+      ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(W, i); ctx.stroke();
+    }
+  }
+
+  function drawGenericScene(ctx, W, H, state) {
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#0e0c06');
+    bg.addColorStop(1, '#1a1208');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function downloadCard() {
+    const canvas = document.getElementById('output-canvas');
+    const stateKey = document.getElementById('state-select').value;
+    const stateName = states[stateKey]?.name || 'state';
+    const link = document.createElement('a');
+    link.download = `adopt-a-state-${stateName.toLowerCase().replace(' ', '-')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+</script>
+</body>
+</html>
