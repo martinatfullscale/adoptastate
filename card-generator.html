@@ -1344,26 +1344,26 @@
     const boxX = W / 2 - boxW / 2;
     const boxY = L.boxY;
 
-    ctx.fillStyle = 'rgba(200,134,10,0.12)';
-    ctx.strokeStyle = 'rgba(200,134,10,0.35)';
-    ctx.lineWidth = 1;
+    ctx.fillStyle = 'rgba(10,8,4,0.7)';
     ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.strokeStyle = 'rgba(200,134,10,0.5)';
+    ctx.lineWidth = 2;
     ctx.strokeRect(boxX, boxY, boxW, boxH);
 
     // Stats text
-    ctx.fillStyle = '#c8860a';
+    ctx.fillStyle = '#f5a623';
     ctx.font = `bold ${L.statNumSize}px "Playfair Display", serif`;
     ctx.textAlign = 'center';
     ctx.fillText(state.ratio, boxX + boxW * 0.28, boxY + L.statNumOff);
     ctx.fillText(state.net, boxX + boxW * 0.72, boxY + L.statNumOff);
 
-    ctx.fillStyle = 'rgba(244,239,228,0.4)';
+    ctx.fillStyle = 'rgba(244,239,228,0.7)';
     ctx.font = `500 ${L.statLabelSize}px "DM Mono", monospace`;
     ctx.fillText('received per $1', boxX + boxW * 0.28, boxY + L.statLabelOff);
     ctx.fillText('net received', boxX + boxW * 0.72, boxY + L.statLabelOff);
 
     // Divider
-    ctx.fillStyle = 'rgba(200,134,10,0.25)';
+    ctx.fillStyle = 'rgba(200,134,10,0.4)';
     ctx.fillRect(boxX + boxW / 2 - 0.5, boxY + 12, 1, boxH - 24);
 
     // ── BOTTOM TAG ──
