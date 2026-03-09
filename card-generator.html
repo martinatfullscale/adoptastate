@@ -467,6 +467,49 @@
 
     .dl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
+    /* SAVE OPTIONS MENU */
+    .save-options {
+      display: none;
+      width: 100%;
+      max-width: 540px;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: -4px;
+    }
+
+    .save-options.visible { display: flex; }
+
+    .save-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(244,239,228,0.06);
+      border: 1px solid rgba(244,239,228,0.1);
+      color: var(--cream);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .save-option:hover {
+      background: rgba(200,134,10,0.15);
+      border-color: rgba(200,134,10,0.4);
+    }
+
+    .save-option .opt-icon { font-size: 18px; flex-shrink: 0; }
+    .save-option .opt-label { flex: 1; }
+    .save-option .opt-desc {
+      font-size: 9px;
+      color: rgba(244,239,228,0.4);
+      letter-spacing: 0.5px;
+      text-transform: none;
+      margin-top: 2px;
+    }
+
     /* CAPTION AREA */
     .caption-preview {
       width: 100%;
@@ -620,13 +663,14 @@
     </div>
 
     <div class="download-actions">
-      <button class="dl-btn dl-primary" id="dl-btn" onclick="downloadCard()" disabled>
-        Save / Copy Image
+      <button class="dl-btn dl-primary" id="dl-btn" onclick="saveCard()" disabled>
+        Save Image
       </button>
       <button class="dl-btn dl-secondary" id="copy-caption-btn" onclick="copyCaption()" disabled>
         Copy Caption
       </button>
     </div>
+    <div class="save-options" id="save-options"></div>
 
     <div class="caption-preview">
       <p class="caption-label">// Suggested Caption</p>
@@ -1483,51 +1527,83 @@
     }
   }
 
-  async function downloadCard() {
-    const canvas = document.getElementById('output-canvas');
+  function getFileName() {
     const stateKey = document.getElementById('state-select').value;
     const stateName = states[stateKey]?.name || 'state';
     const suffix = currentRatio === 'story' ? '-story' : '';
-    const fileName = `adopt-a-state-${stateName.toLowerCase().replace(/ /g, '-')}${suffix}.png`;
-    const btn = document.getElementById('dl-btn');
+    return `adopt-a-state-${stateName.toLowerCase().replace(/ /g, '-')}${suffix}.png`;
+  }
 
-    try {
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  async function getCanvasBlob() {
+    const canvas = document.getElementById('output-canvas');
+    return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  }
 
-      // Mobile: share sheet (Save to Photos, AirDrop, Messages, etc.)
-      if (isMobile && navigator.share && navigator.canShare) {
-        const file = new File([blob], fileName, { type: 'image/png' });
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file] });
-          return;
-        }
+  function saveCard() {
+    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isMobile) {
+      // Mobile: go straight to share sheet (Save to Photos)
+      doShare();
+    } else {
+      // Desktop: toggle options menu
+      const menu = document.getElementById('save-options');
+      if (menu.classList.contains('visible')) {
+        menu.classList.remove('visible');
+        return;
       }
-
-      // Desktop (or mobile fallback): copy image to clipboard
-      if (navigator.clipboard && navigator.clipboard.write) {
-        try {
-          await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob })
-          ]);
-          const orig = btn.textContent;
-          btn.textContent = 'Copied to clipboard ✓';
-          setTimeout(() => { btn.textContent = orig; }, 2000);
-          return;
-        } catch (e) { /* clipboard failed, fall through */ }
+      menu.innerHTML = '';
+      const options = [
+        { icon: '📋', label: 'Copy to Clipboard', desc: 'Paste anywhere', action: doCopy },
+        { icon: '💾', label: 'Save to Downloads', desc: 'Save as PNG file', action: doDownload },
+      ];
+      if (navigator.share && navigator.canShare) {
+        options.push({ icon: '📤', label: 'Share...', desc: 'AirDrop, Messages, etc.', action: doShare });
       }
-
-      // Last resort: traditional download
-      const link = document.createElement('a');
-      link.download = fileName;
-      link.href = URL.createObjectURL(blob);
-      link.click();
-      URL.revokeObjectURL(link.href);
-    } catch (e) {
-      if (e.name !== 'AbortError') {
-        console.error('Save failed:', e);
-      }
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'save-option';
+        btn.innerHTML = `<span class="opt-icon">${opt.icon}</span><div class="opt-label">${opt.label}<div class="opt-desc">${opt.desc}</div></div>`;
+        btn.onclick = () => { menu.classList.remove('visible'); opt.action(); };
+        menu.appendChild(btn);
+      });
+      menu.classList.add('visible');
     }
+  }
+
+  async function doShare() {
+    try {
+      const blob = await getCanvasBlob();
+      const file = new File([blob], getFileName(), { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] });
+      } else {
+        doCopy();
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') doCopy();
+    }
+  }
+
+  async function doCopy() {
+    const btn = document.getElementById('dl-btn');
+    try {
+      const blob = await getCanvasBlob();
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    } catch (e) {
+      doDownload();
+    }
+  }
+
+  async function doDownload() {
+    const blob = await getCanvasBlob();
+    const link = document.createElement('a');
+    link.download = getFileName();
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
 </script>
 </body>
