@@ -621,7 +621,7 @@
 
     <div class="download-actions">
       <button class="dl-btn dl-primary" id="dl-btn" onclick="downloadCard()" disabled>
-        ⬇ Download Card
+        Save / Copy Image
       </button>
       <button class="dl-btn dl-secondary" id="copy-caption-btn" onclick="copyCaption()" disabled>
         Copy Caption
@@ -1489,12 +1489,14 @@
     const stateName = states[stateKey]?.name || 'state';
     const suffix = currentRatio === 'story' ? '-story' : '';
     const fileName = `adopt-a-state-${stateName.toLowerCase().replace(/ /g, '-')}${suffix}.png`;
+    const btn = document.getElementById('dl-btn');
 
     try {
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-      // Try Web Share API first (opens iOS share sheet with "Save Image")
-      if (navigator.share && navigator.canShare) {
+      // Mobile: share sheet (Save to Photos, AirDrop, Messages, etc.)
+      if (isMobile && navigator.share && navigator.canShare) {
         const file = new File([blob], fileName, { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file] });
@@ -1502,27 +1504,28 @@
         }
       }
 
-      // Fallback: copy image to clipboard
+      // Desktop (or mobile fallback): copy image to clipboard
       if (navigator.clipboard && navigator.clipboard.write) {
         try {
           await navigator.clipboard.write([
             new ClipboardItem({ 'image/png': blob })
           ]);
-          alert('Image copied to clipboard!');
+          const orig = btn.textContent;
+          btn.textContent = 'Copied to clipboard ✓';
+          setTimeout(() => { btn.textContent = orig; }, 2000);
           return;
         } catch (e) { /* clipboard failed, fall through */ }
       }
 
-      // Last resort: traditional download link
+      // Last resort: traditional download
       const link = document.createElement('a');
       link.download = fileName;
       link.href = URL.createObjectURL(blob);
       link.click();
       URL.revokeObjectURL(link.href);
     } catch (e) {
-      // User cancelled share sheet — do nothing
       if (e.name !== 'AbortError') {
-        console.error('Download failed:', e);
+        console.error('Save failed:', e);
       }
     }
   }
