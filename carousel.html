@@ -112,10 +112,10 @@
 
 <script>
 const W = 1080, H = 1350;
-const PAD = 100;
+const PAD = 120;
 const CX = W / 2;
 
-// ── Drawing Helpers (sized for phone viewing) ──
+// ── Drawing Helpers (IG-native sizes — readable on phone) ──
 
 function drawGrain(ctx) {
   const tmp = document.createElement('canvas');
@@ -134,93 +134,53 @@ function drawGrain(ctx) {
 }
 
 function eyebrow(ctx, text, y) {
-  ctx.font = '24px "DM Mono", monospace';
+  ctx.font = '36px "DM Mono", monospace';
   ctx.fillStyle = '#c8860a';
   ctx.textAlign = 'center';
   ctx.fillText(text, CX, y);
 }
 
-function title(ctx, text, y, size) {
+function heading(ctx, text, y, size) {
   ctx.font = `bold ${size}px "Playfair Display", serif`;
-  ctx.fillStyle = 'rgba(245,240,232,0.95)';
+  ctx.fillStyle = '#f5f0e8';
   ctx.textAlign = 'center';
   text.split('\n').forEach((line, i) => {
-    ctx.fillText(line, CX, y + i * (size * 1.18));
+    ctx.fillText(line, CX, y + i * (size * 1.15));
   });
 }
 
-function italic(ctx, text, y, size, color) {
+function sub(ctx, text, y, size, color) {
   ctx.font = `italic ${size}px "Playfair Display", serif`;
-  ctx.fillStyle = color || 'rgba(245,240,232,0.5)';
+  ctx.fillStyle = color || 'rgba(245,240,232,0.55)';
   ctx.textAlign = 'center';
   text.split('\n').forEach((line, i) => {
-    ctx.fillText(line, CX, y + i * (size * 1.35));
+    ctx.fillText(line, CX, y + i * (size * 1.4));
   });
 }
 
-function body(ctx, text, y, size) {
+function copy(ctx, text, y, size) {
   ctx.font = `300 ${size}px "Source Serif 4", serif`;
-  ctx.fillStyle = 'rgba(245,240,232,0.7)';
+  ctx.fillStyle = 'rgba(245,240,232,0.75)';
   ctx.textAlign = 'center';
   text.split('\n').forEach((line, i) => {
-    ctx.fillText(line, CX, y + i * (size * 1.55));
+    ctx.fillText(line, CX, y + i * (size * 1.5));
   });
 }
 
-function amberLine(ctx, y) {
+function rule(ctx, y) {
   ctx.strokeStyle = '#c8860a';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(CX - 50, y);
-  ctx.lineTo(CX + 50, y);
+  ctx.moveTo(CX - 60, y);
+  ctx.lineTo(CX + 60, y);
   ctx.stroke();
 }
 
-function footer(ctx, text) {
-  ctx.font = '22px "DM Mono", monospace';
+function tag(ctx, text) {
+  ctx.font = '28px "DM Mono", monospace';
   ctx.fillStyle = 'rgba(245,240,232,0.2)';
   ctx.textAlign = 'center';
-  ctx.fillText(text, CX, H - 60);
-}
-
-function bigStat(ctx, text, y) {
-  ctx.font = 'bold 180px "Playfair Display", serif';
-  ctx.fillStyle = '#c8860a';
-  ctx.textAlign = 'center';
-  ctx.fillText(text, CX, y);
-}
-
-function statPair(ctx, n1, l1, n2, l2, y) {
-  const colW = (W - PAD * 2) / 2;
-  ctx.textAlign = 'center';
-  // Left
-  ctx.font = 'bold 72px "Playfair Display", serif';
-  ctx.fillStyle = '#b84040';
-  ctx.fillText(n1, PAD + colW/2, y);
-  ctx.font = '26px "Source Serif 4", serif';
-  ctx.fillStyle = 'rgba(245,240,232,0.5)';
-  ctx.fillText(l1, PAD + colW/2, y + 44);
-  // Right
-  ctx.font = 'bold 72px "Playfair Display", serif';
-  ctx.fillStyle = '#b84040';
-  ctx.fillText(n2, PAD + colW + colW/2, y);
-  ctx.font = '26px "Source Serif 4", serif';
-  ctx.fillStyle = 'rgba(245,240,232,0.5)';
-  ctx.fillText(l2, PAD + colW + colW/2, y + 44);
-}
-
-function wrapText(ctx, text, x, y, maxW, lh) {
-  const words = text.split(' ');
-  let line = '', ty = y;
-  for (const w of words) {
-    const test = line + w + ' ';
-    if (ctx.measureText(test).width > maxW && line) {
-      ctx.fillText(line.trim(), x, ty);
-      line = w + ' ';
-      ty += lh;
-    } else { line = test; }
-  }
-  ctx.fillText(line.trim(), x, ty);
+  ctx.fillText(text, CX, H - 70);
 }
 
 // ── 10 Slides ──
@@ -231,11 +191,11 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      eyebrow(ctx, 'A TAXPAYER AWARENESS INITIATIVE', H * 0.20);
-      title(ctx, 'You\'ve Been\nGiving\nAll Along.', H * 0.33, 100);
-      amberLine(ctx, H * 0.62);
-      body(ctx, 'Blue-state taxpayers quietly fund\nred-state infrastructure.\nNo thank you note. Ever.', H * 0.68, 36);
-      footer(ctx, 'iadoptedastate.org');
+      eyebrow(ctx, 'TAXPAYER AWARENESS', H * 0.25);
+      heading(ctx, 'You\'ve Been\nGiving\nAll Along.', H * 0.40, 130);
+      rule(ctx, H * 0.68);
+      copy(ctx, 'No press release.\nNo thank you note.', H * 0.75, 48);
+      tag(ctx, 'iadoptedastate.org');
     }
   },
   // 2 — The Big Number
@@ -243,16 +203,18 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      eyebrow(ctx, 'THE FACTS', H * 0.22);
-      bigStat(ctx, '$13.7B', H * 0.42);
-      ctx.font = '36px "Source Serif 4", serif';
-      ctx.fillStyle = 'rgba(245,240,232,0.6)';
+      eyebrow(ctx, 'CALIFORNIA ALONE', H * 0.25);
+      ctx.font = 'bold 240px "Playfair Display", serif';
+      ctx.fillStyle = '#c8860a';
       ctx.textAlign = 'center';
-      ctx.fillText('California\'s net contribution', CX, H * 0.50);
-      ctx.fillText('to the federal system', CX, H * 0.55);
-      amberLine(ctx, H * 0.64);
-      body(ctx, 'Roads. Hospitals. Schools.\nIn states that never said\nthank you.', H * 0.71, 38);
-      footer(ctx, 'Rockefeller Institute of Government');
+      ctx.fillText('$13.7B', CX, H * 0.48);
+      ctx.font = '48px "Source Serif 4", serif';
+      ctx.fillStyle = 'rgba(245,240,232,0.6)';
+      ctx.fillText('net contribution to', CX, H * 0.57);
+      ctx.fillText('the federal system', CX, H * 0.63);
+      rule(ctx, H * 0.72);
+      copy(ctx, 'No one said thank you.', H * 0.80, 48);
+      tag(ctx, 'Rockefeller Institute');
     }
   },
   // 3 — Mississippi
@@ -260,16 +222,21 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      eyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.14);
-      ctx.font = '140px serif';
+      eyebrow(ctx, 'YOUR BENEFICIARY', H * 0.15);
+      ctx.font = '180px serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🌊', CX, H * 0.27);
-      title(ctx, 'Mississippi', H * 0.37, 90);
-      italic(ctx, '"America\'s Most Beloved\nBeneficiary"', H * 0.44, 34);
-      amberLine(ctx, H * 0.54);
-      statPair(ctx, '$2.13', 'per $1 sent', '$4.1B', 'net received', H * 0.63);
-      body(ctx, 'Your taxes keep its roads\npassable and its bridges\nlargely intact.', H * 0.78, 36);
-      footer(ctx, 'iadoptedastate.org');
+      ctx.fillText('🌊', CX, H * 0.30);
+      heading(ctx, 'Mississippi', H * 0.42, 110);
+      rule(ctx, H * 0.50);
+      // Stats — big and bold
+      ctx.font = 'bold 120px "Playfair Display", serif';
+      ctx.fillStyle = '#b84040';
+      ctx.fillText('$2.13', CX, H * 0.64);
+      ctx.font = '42px "Source Serif 4", serif';
+      ctx.fillStyle = 'rgba(245,240,232,0.55)';
+      ctx.fillText('received per $1 you sent', CX, H * 0.70);
+      copy(ctx, '"America\'s Most Beloved\nBeneficiary"', H * 0.82, 44);
+      tag(ctx, 'iadoptedastate.org');
     }
   },
   // 4 — Kentucky
@@ -277,16 +244,20 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      eyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.14);
-      ctx.font = '140px serif';
+      eyebrow(ctx, 'YOUR BENEFICIARY', H * 0.15);
+      ctx.font = '180px serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🐎', CX, H * 0.27);
-      title(ctx, 'Kentucky', H * 0.37, 90);
-      italic(ctx, '"Bootstraps Not Included"', H * 0.44, 34);
-      amberLine(ctx, H * 0.54);
-      statPair(ctx, '$2.41', 'per $1 sent', '$22.9B', 'net received', H * 0.63);
-      body(ctx, 'Most federal aid per capita.\nStrong opinions about\ngovernment spending.', H * 0.78, 36);
-      footer(ctx, 'iadoptedastate.org');
+      ctx.fillText('🐎', CX, H * 0.30);
+      heading(ctx, 'Kentucky', H * 0.42, 110);
+      rule(ctx, H * 0.50);
+      ctx.font = 'bold 120px "Playfair Display", serif';
+      ctx.fillStyle = '#b84040';
+      ctx.fillText('$2.41', CX, H * 0.64);
+      ctx.font = '42px "Source Serif 4", serif';
+      ctx.fillStyle = 'rgba(245,240,232,0.55)';
+      ctx.fillText('received per $1 you sent', CX, H * 0.70);
+      copy(ctx, '"Bootstraps Not Included"', H * 0.82, 44);
+      tag(ctx, 'iadoptedastate.org');
     }
   },
   // 5 — West Virginia
@@ -294,16 +265,20 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      eyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.14);
-      ctx.font = '140px serif';
+      eyebrow(ctx, 'YOUR BENEFICIARY', H * 0.15);
+      ctx.font = '180px serif';
       ctx.textAlign = 'center';
-      ctx.fillText('⛰️', CX, H * 0.27);
-      title(ctx, 'West Virginia', H * 0.37, 82);
-      italic(ctx, '"Almost Heaven,\nFully Funded"', H * 0.44, 34);
-      amberLine(ctx, H * 0.54);
-      statPair(ctx, '$2.07', 'per $1 sent', '$6.5B', 'net received', H * 0.63);
-      body(ctx, 'Its infrastructure maintained\nby the involuntary generosity\nof NY, NJ, and CA.', H * 0.78, 36);
-      footer(ctx, 'iadoptedastate.org');
+      ctx.fillText('⛰️', CX, H * 0.30);
+      heading(ctx, 'West Virginia', H * 0.42, 100);
+      rule(ctx, H * 0.50);
+      ctx.font = 'bold 120px "Playfair Display", serif';
+      ctx.fillStyle = '#b84040';
+      ctx.fillText('$2.07', CX, H * 0.64);
+      ctx.font = '42px "Source Serif 4", serif';
+      ctx.fillStyle = 'rgba(245,240,232,0.55)';
+      ctx.fillText('received per $1 you sent', CX, H * 0.70);
+      copy(ctx, '"Almost Heaven,\nFully Funded"', H * 0.82, 44);
+      tag(ctx, 'iadoptedastate.org');
     }
   },
   // 6 — The Scoreboard
@@ -311,27 +286,25 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      eyebrow(ctx, 'BY THE NUMBERS', H * 0.12);
-      title(ctx, 'The\nScoreboard.', H * 0.20, 88);
-      amberLine(ctx, H * 0.38);
+      heading(ctx, 'The\nScoreboard.', H * 0.18, 110);
+      rule(ctx, H * 0.36);
       const rows = [
-        ['34 states', 'receive more than they give'],
-        ['$0', 'thank you notes received'],
-        ['77%', 'of MS Medicaid paid by you'],
-        ['$3,284/yr', 'Alaska pays residents to live there'],
+        ['34 states', 'take more than they give'],
+        ['$0', 'thank you notes'],
+        ['77%', 'of MS Medicaid is you'],
       ];
       let y = H * 0.44;
       rows.forEach(([num, label]) => {
-        ctx.font = 'bold 56px "Playfair Display", serif';
+        ctx.font = 'bold 80px "Playfair Display", serif';
         ctx.fillStyle = '#c8860a';
         ctx.textAlign = 'left';
         ctx.fillText(num, PAD, y);
-        ctx.font = '32px "Source Serif 4", serif';
+        ctx.font = '42px "Source Serif 4", serif';
         ctx.fillStyle = 'rgba(245,240,232,0.55)';
-        ctx.fillText(label, PAD, y + 48);
-        y += 120;
+        ctx.fillText(label, PAD, y + 60);
+        y += 160;
       });
-      footer(ctx, 'Tax Foundation · USASpending.gov');
+      tag(ctx, 'Tax Foundation');
     }
   },
   // 7 — Sponsored Infrastructure
@@ -339,27 +312,26 @@ const SLIDES = [
     bg: '#3a5a8a',
     render(ctx) {
       drawGrain(ctx);
-      eyebrow(ctx, 'BROUGHT TO YOU BY', H * 0.14);
-      title(ctx, 'Sponsored\nInfrastructure.', H * 0.24, 80);
-      amberLine(ctx, H * 0.42);
+      eyebrow(ctx, 'BROUGHT TO YOU BY', H * 0.15);
+      heading(ctx, 'Sponsored\nInfra.', H * 0.26, 100);
+      rule(ctx, H * 0.44);
       const items = [
-        ['I-65 Expansion, KY', 'New York Taxpayers 🧡'],
-        ['Medicaid, Jackson MS', 'California Taxpayers 🧡'],
-        ['Rural Broadband, WV', 'New Jersey Taxpayers 🧡'],
-        ['FEMA Relief, SC', 'Massachusetts Taxpayers 🧡'],
+        ['I-65, Kentucky', 'NY Taxpayers 🧡'],
+        ['Medicaid, Mississippi', 'CA Taxpayers 🧡'],
+        ['Broadband, West Virginia', 'NJ Taxpayers 🧡'],
       ];
-      let y = H * 0.49;
+      let y = H * 0.52;
       items.forEach(([proj, sponsor]) => {
-        ctx.font = '36px "Source Serif 4", serif';
-        ctx.fillStyle = 'rgba(245,240,232,0.9)';
+        ctx.font = '44px "Source Serif 4", serif';
+        ctx.fillStyle = '#f5f0e8';
         ctx.textAlign = 'left';
         ctx.fillText(proj, PAD, y);
-        ctx.font = '28px "Source Serif 4", serif';
+        ctx.font = '38px "Source Serif 4", serif';
         ctx.fillStyle = '#c8860a';
-        ctx.fillText(sponsor, PAD, y + 42);
-        y += 110;
+        ctx.fillText(sponsor, PAD, y + 54);
+        y += 140;
       });
-      footer(ctx, 'Real projects. Real federal dollars.');
+      tag(ctx, 'Real projects. Real dollars.');
     }
   },
   // 8 — The Quote
@@ -367,18 +339,29 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      ctx.font = 'italic 52px "Playfair Display", serif';
-      ctx.fillStyle = 'rgba(245,240,232,0.9)';
+      ctx.font = 'italic 72px "Playfair Display", serif';
+      ctx.fillStyle = '#f5f0e8';
       ctx.textAlign = 'center';
-      wrapText(ctx, '"The beauty of Adopt-A-State is that you never had a choice. But you can still feel good about it."', CX, H * 0.28, W - PAD * 2, 72);
-      amberLine(ctx, H * 0.66);
-      ctx.font = '26px "DM Mono", monospace';
+      const q = '"You never had a choice. But you can still feel good about it."';
+      // manual wrap for big text
+      const lines = [
+        '"You never',
+        'had a choice.',
+        'But you can',
+        'still feel good',
+        'about it."',
+      ];
+      let y = H * 0.25;
+      lines.forEach(line => {
+        ctx.fillText(line, CX, y);
+        y += 100;
+      });
+      rule(ctx, H * 0.68);
+      ctx.font = '36px "DM Mono", monospace';
       ctx.fillStyle = '#c8860a';
-      ctx.fillText('ADOPT-A-STATE FOUNDER', CX, H * 0.72);
-      ctx.font = '24px "Source Serif 4", serif';
-      ctx.fillStyle = 'rgba(245,240,232,0.4)';
-      ctx.fillText('Unpaid, Like Most of This', CX, H * 0.76);
-      footer(ctx, 'iadoptedastate.org');
+      ctx.fillText('ADOPT-A-STATE FOUNDER', CX, H * 0.75);
+      copy(ctx, 'Unpaid, like most of this', H * 0.82, 40);
+      tag(ctx, 'iadoptedastate.org');
     }
   },
   // 9 — Make Your Card CTA
@@ -386,12 +369,11 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      eyebrow(ctx, 'SHOW YOUR APPRECIATION', H * 0.22);
-      title(ctx, 'Make Your\nOwn Card.', H * 0.34, 96);
-      italic(ctx, 'Since They Won\'t\nDo It for You.', H * 0.55, 52, '#c8860a');
-      amberLine(ctx, H * 0.70);
-      body(ctx, 'Upload your photo. Pick your state.\nSay what they never will.', H * 0.76, 36);
-      footer(ctx, 'iadoptedastate.org/card-generator');
+      eyebrow(ctx, 'YOUR TURN', H * 0.22);
+      heading(ctx, 'Make Your\nOwn Card.', H * 0.36, 120);
+      rule(ctx, H * 0.58);
+      sub(ctx, 'Since they won\'t\ndo it for you.', H * 0.65, 64, '#c8860a');
+      tag(ctx, 'iadoptedastate.org/card-generator');
     }
   },
   // 10 — Closer / CTA
@@ -399,24 +381,21 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      ctx.font = '200px serif';
+      ctx.font = '260px serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🫶', CX, H * 0.30);
-      title(ctx, 'Adopt-A-State', H * 0.44, 80);
-      italic(ctx, 'A Taxpayer Awareness Initiative', H * 0.51, 30);
-      amberLine(ctx, H * 0.58);
-      body(ctx, 'They can\'t do it alone.\nThey never could.', H * 0.65, 42);
+      ctx.fillText('🫶', CX, H * 0.32);
+      heading(ctx, 'Adopt-A-State', H * 0.48, 100);
+      rule(ctx, H * 0.56);
+      copy(ctx, 'They can\'t do it alone.\nThey never could.', H * 0.64, 52);
       // URL box
-      const boxW = 620, boxH = 90;
+      const boxW = 700, boxH = 110;
+      const boxY = H * 0.78;
       ctx.strokeStyle = 'rgba(200,134,10,0.5)';
-      ctx.lineWidth = 2.5;
-      ctx.strokeRect((W - boxW)/2, H * 0.76, boxW, boxH);
-      ctx.font = '34px "DM Mono", monospace';
+      ctx.lineWidth = 3;
+      ctx.strokeRect((W - boxW)/2, boxY, boxW, boxH);
+      ctx.font = '44px "DM Mono", monospace';
       ctx.fillStyle = '#c8860a';
-      ctx.fillText('iadoptedastate.org', CX, H * 0.76 + boxH/2 + 12);
-      ctx.font = '22px "Source Serif 4", serif';
-      ctx.fillStyle = 'rgba(245,240,232,0.35)';
-      ctx.fillText('This is real. All of it.', CX, H * 0.92);
+      ctx.fillText('iadoptedastate.org', CX, boxY + boxH/2 + 16);
     }
   },
 ];
