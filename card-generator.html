@@ -480,7 +480,7 @@
           <div class="crop-mask"></div>
           <div class="crop-ring"></div>
         </div>
-        <p class="crop-hint">Drag to reposition · Scroll to zoom</p>
+        <p class="crop-hint">Scroll to zoom in · Drag to reposition</p>
         <button class="change-photo-btn" id="change-photo-btn">Change Photo</button>
       </div>
     </div>
@@ -952,20 +952,18 @@
         const imgAspect = cropImg.naturalWidth / cropImg.naturalHeight;
         const containerAspect = cW / cH;
 
-        // Cover fit: image fills the container completely
+        // Contain fit: show full image, user zooms in
         if (imgAspect > containerAspect) {
-          cropBaseH = cH;
-          cropBaseW = cH * imgAspect;
-        } else {
           cropBaseW = cW;
           cropBaseH = cW / imgAspect;
+        } else {
+          cropBaseH = cH;
+          cropBaseW = cH * imgAspect;
         }
 
         cropScale = 1;
         cropX = (cW - cropBaseW) / 2;
-        // Bias toward upper third for portrait photos (faces are usually near top)
-        const overflowY = cropBaseH - cH;
-        cropY = overflowY > 0 ? -(overflowY * 0.33) : (cH - cropBaseH) / 2;
+        cropY = (cH - cropBaseH) / 2;
         applyCropTransform();
       });
     };
@@ -988,11 +986,19 @@
     const cH = container.clientHeight;
     const w = cropBaseW * cropScale;
     const h = cropBaseH * cropScale;
-    // Don't let the image edge come inside the container
-    if (cropX > 0) cropX = 0;
-    if (cropY > 0) cropY = 0;
-    if (cropX < cW - w) cropX = cW - w;
-    if (cropY < cH - h) cropY = cH - h;
+    // If image fills dimension, prevent gaps; otherwise center it
+    if (w >= cW) {
+      if (cropX > 0) cropX = 0;
+      if (cropX < cW - w) cropX = cW - w;
+    } else {
+      cropX = (cW - w) / 2;
+    }
+    if (h >= cH) {
+      if (cropY > 0) cropY = 0;
+      if (cropY < cH - h) cropY = cH - h;
+    } else {
+      cropY = (cH - h) / 2;
+    }
   }
 
   // Drag handlers
@@ -1039,7 +1045,7 @@
 
     const oldScale = cropScale;
     const delta = e.deltaY > 0 ? -0.08 : 0.08;
-    cropScale = Math.max(1, Math.min(4, cropScale + delta));
+    cropScale = Math.max(1, Math.min(6, cropScale + delta));
 
     // Zoom toward mouse pointer
     const ratio = cropScale / oldScale;
@@ -1074,7 +1080,7 @@
       const cy = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
 
       const oldScale = cropScale;
-      cropScale = Math.max(1, Math.min(4, cropScale * (dist / lastPinchDist)));
+      cropScale = Math.max(1, Math.min(6, cropScale * (dist / lastPinchDist)));
       lastPinchDist = dist;
 
       const ratio = cropScale / oldScale;
