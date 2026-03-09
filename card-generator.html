@@ -1287,8 +1287,7 @@
       lineY: 188,
       photoSize: 460,
       photoY: H * 0.24,
-      emojiSize: 90,
-      emojiGap: 56,
+
       fundedY: H * 0.47,
       fundedSize: 120,
       stateNameY: H * 0.47 + 160,
@@ -1312,8 +1311,7 @@
       lineY: 88,
       photoSize: 240,
       photoY: H * 0.38,
-      emojiSize: 56,
-      emojiGap: 36,
+
       fundedY: H * 0.62,
       fundedSize: 62,
       stateNameY: H * 0.62 + 82,
@@ -1435,10 +1433,6 @@
     // Thin line
     ctx.fillStyle = 'rgba(200,134,10,0.3)';
     ctx.fillRect(W/2 - 160, L.lineY, 320, 1);
-
-    // ── STATE EMOJI & BADGE ──
-    ctx.font = `${L.emojiSize}px serif`;
-    ctx.fillText(state.emoji, W / 2, photoY - photoSize / 2 - L.emojiGap);
 
     // ── MAIN TEXT ──
     ctx.fillStyle = '#f4efe4';
