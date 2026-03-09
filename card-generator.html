@@ -692,6 +692,156 @@
     }
   };
 
+  // ── BACKGROUND IMAGE SETS (randomized per state/style) ──
+  const bgImageSets = {
+    'mississippi': {
+      bridge: [
+        {url:'https://plus.unsplash.com/premium_photo-1751906599402-2cb93a68c54d?w=1080&fit=crop&q=80', name:'I-20 Bridge, Vicksburg, MS'},
+        {url:'https://images.unsplash.com/photo-1621302879828-a43aea3cb9fa?w=1080&fit=crop&q=80', name:'Biloxi Bay Bridge, Biloxi, MS'}
+      ],
+      highway: [
+        {url:'https://plus.unsplash.com/premium_photo-1663951812821-08c681ada29b?w=1080&fit=crop&q=80', name:'I-55, Jackson, MS'},
+        {url:'https://images.unsplash.com/photo-1754956043143-f1f313538238?w=1080&fit=crop&q=80', name:'Natchez Trace Parkway, MS'}
+      ],
+      school: [
+        {url:'https://plus.unsplash.com/premium_photo-1664392174061-465287b7e3df?w=1080&fit=crop&q=80', name:'Ole Miss, Oxford, MS'},
+        {url:'https://images.unsplash.com/photo-1670284768187-5cc68eada1b3?w=1080&fit=crop&q=80', name:'Jackson State University, Jackson, MS'}
+      ],
+      hospital: [
+        {url:'https://plus.unsplash.com/premium_photo-1673988726931-127584121c34?w=1080&fit=crop&q=80', name:'UMMC, Jackson, MS'},
+        {url:'https://images.unsplash.com/photo-1769147555720-71fc71bfc216?w=1080&fit=crop&q=80', name:'North MS Medical Center, Tupelo, MS'}
+      ]
+    },
+    'kentucky': {
+      bridge: [
+        {url:'https://images.unsplash.com/photo-1665780992868-dbbc47e611b5?w=1080&fit=crop&q=80', name:'Roebling Bridge, Covington, KY'},
+        {url:'https://images.unsplash.com/photo-1621302879828-a43aea3cb9fa?w=1080&fit=crop&q=80', name:'Big Four Bridge, Louisville, KY'}
+      ],
+      highway: [
+        {url:'https://images.unsplash.com/photo-1626443827633-d7a4d2376bab?w=1080&fit=crop&q=80', name:'I-64, Lexington, KY'},
+        {url:'https://images.unsplash.com/photo-1628875804415-e5c54aca65df?w=1080&fit=crop&q=80', name:'Mountain Parkway, KY'}
+      ],
+      school: [
+        {url:'https://images.unsplash.com/photo-1675295740364-320b831fd16e?w=1080&fit=crop&q=80', name:'University of Kentucky, Lexington, KY'},
+        {url:'https://images.unsplash.com/photo-1741639309891-954860932e73?w=1080&fit=crop&q=80', name:'University of Louisville, Louisville, KY'}
+      ],
+      hospital: [
+        {url:'https://images.unsplash.com/photo-1764885518098-781b23d50e7f?w=1080&fit=crop&q=80', name:'UK HealthCare, Lexington, KY'},
+        {url:'https://plus.unsplash.com/premium_photo-1697729784795-7dba41230494?w=1080&fit=crop&q=80', name:'Norton Hospital, Louisville, KY'}
+      ]
+    },
+    'west-virginia': {
+      bridge: [
+        {url:'https://images.unsplash.com/photo-1737562783093-b867d5a60453?w=1080&fit=crop&q=80', name:'New River Gorge Bridge, Fayetteville, WV'},
+        {url:'https://images.unsplash.com/photo-1621302879828-a43aea3cb9fa?w=1080&fit=crop&q=80', name:'Veterans Memorial Bridge, Wheeling, WV'}
+      ],
+      highway: [
+        {url:'https://images.unsplash.com/photo-1669488825919-151f302fd51f?w=1080&fit=crop&q=80', name:'I-64, Kanawha Valley, WV'},
+        {url:'https://images.unsplash.com/photo-1603208636732-84c54dfc3f66?w=1080&fit=crop&q=80', name:'Route 219, WV'}
+      ],
+      school: [
+        {url:'https://plus.unsplash.com/premium_photo-1658506724186-63a705425f89?w=1080&fit=crop&q=80', name:'West Virginia University, Morgantown, WV'},
+        {url:'https://images.unsplash.com/photo-1624295415119-4811300f901f?w=1080&fit=crop&q=80', name:'Marshall University, Huntington, WV'}
+      ],
+      hospital: [
+        {url:'https://images.unsplash.com/photo-1596541223130-5d31a73fb6c6?w=1080&fit=crop&q=80', name:'Ruby Memorial Hospital, Morgantown, WV'},
+        {url:'https://plus.unsplash.com/premium_photo-1661578549774-7906388bc733?w=1080&fit=crop&q=80', name:'CAMC, Charleston, WV'}
+      ]
+    },
+    'alabama': {
+      bridge: [
+        {url:'https://images.unsplash.com/photo-1621302879828-a43aea3cb9fa?w=1080&fit=crop&q=80', name:'Edmund Pettus Bridge, Selma, AL'},
+        {url:'https://images.unsplash.com/photo-1737562783093-b867d5a60453?w=1080&fit=crop&q=80', name:'Cochrane Bridge, Mobile, AL'}
+      ],
+      highway: [
+        {url:'https://images.unsplash.com/photo-1635553248176-de445d7a0875?w=1080&fit=crop&q=80', name:'I-65, Montgomery, AL'},
+        {url:'https://images.unsplash.com/photo-1655934161455-11042d605a5a?w=1080&fit=crop&q=80', name:'I-20, Birmingham, AL'}
+      ],
+      school: [
+        {url:'https://images.unsplash.com/photo-1640456515709-6a8cff434df9?w=1080&fit=crop&q=80', name:'University of Alabama, Tuscaloosa, AL'},
+        {url:'https://images.unsplash.com/photo-1741639309920-451e9a913d06?w=1080&fit=crop&q=80', name:'Auburn University, Auburn, AL'}
+      ],
+      hospital: [
+        {url:'https://images.unsplash.com/photo-1597807037496-c56a1d8bc29a?w=1080&fit=crop&q=80', name:'UAB Hospital, Birmingham, AL'},
+        {url:'https://plus.unsplash.com/premium_photo-1673988726931-127584121c34?w=1080&fit=crop&q=80', name:'Huntsville Hospital, Huntsville, AL'}
+      ]
+    },
+    'south-carolina': {
+      bridge: [
+        {url:'https://images.unsplash.com/photo-1639185990621-a4f296b95cf4?w=1080&fit=crop&q=80', name:'Ravenel Bridge, Charleston, SC'},
+        {url:'https://images.unsplash.com/photo-1639182608510-3dd870ed00fb?w=1080&fit=crop&q=80', name:'Arthur Ravenel Jr. Bridge, Charleston, SC'}
+      ],
+      highway: [
+        {url:'https://plus.unsplash.com/premium_photo-1663951812821-08c681ada29b?w=1080&fit=crop&q=80', name:'I-26, Columbia, SC'},
+        {url:'https://images.unsplash.com/photo-1754956043143-f1f313538238?w=1080&fit=crop&q=80', name:'I-85, Greenville, SC'}
+      ],
+      school: [
+        {url:'https://plus.unsplash.com/premium_photo-1664392174061-465287b7e3df?w=1080&fit=crop&q=80', name:'Clemson University, Clemson, SC'},
+        {url:'https://images.unsplash.com/photo-1675295740364-320b831fd16e?w=1080&fit=crop&q=80', name:'College of Charleston, Charleston, SC'}
+      ],
+      hospital: [
+        {url:'https://images.unsplash.com/photo-1769147555720-71fc71bfc216?w=1080&fit=crop&q=80', name:'MUSC, Charleston, SC'},
+        {url:'https://images.unsplash.com/photo-1764885518098-781b23d50e7f?w=1080&fit=crop&q=80', name:'Prisma Health, Greenville, SC'}
+      ]
+    },
+    'alaska': {
+      bridge: [
+        {url:'https://images.unsplash.com/photo-1737562783093-b867d5a60453?w=1080&fit=crop&q=80', name:'Knik River Bridge, Palmer, AK'},
+        {url:'https://images.unsplash.com/photo-1665780992868-dbbc47e611b5?w=1080&fit=crop&q=80', name:'Million Dollar Bridge, Cordova, AK'}
+      ],
+      highway: [
+        {url:'https://images.unsplash.com/photo-1721930513258-887f010ef5a0?w=1080&fit=crop&q=80', name:'Denali Highway, AK'},
+        {url:'https://images.unsplash.com/photo-1658871738877-4824789d14b8?w=1080&fit=crop&q=80', name:'Seward Highway, AK'}
+      ],
+      school: [
+        {url:'https://images.unsplash.com/photo-1670284768187-5cc68eada1b3?w=1080&fit=crop&q=80', name:'University of Alaska, Fairbanks, AK'},
+        {url:'https://images.unsplash.com/photo-1624295415119-4811300f901f?w=1080&fit=crop&q=80', name:'University of Alaska, Anchorage, AK'}
+      ],
+      hospital: [
+        {url:'https://plus.unsplash.com/premium_photo-1697729784795-7dba41230494?w=1080&fit=crop&q=80', name:'Providence Medical Center, Anchorage, AK'},
+        {url:'https://images.unsplash.com/photo-1596541223130-5d31a73fb6c6?w=1080&fit=crop&q=80', name:'Fairbanks Memorial Hospital, Fairbanks, AK'}
+      ]
+    },
+    'arkansas': {
+      bridge: [
+        {url:'https://images.unsplash.com/photo-1658628073095-d366a3fddcc1?w=1080&fit=crop&q=80', name:'Big Dam Bridge, Little Rock, AR'},
+        {url:'https://images.unsplash.com/photo-1585076082431-8e4ded99b1f7?w=1080&fit=crop&q=80', name:'Memphis-Arkansas Bridge, West Memphis, AR'}
+      ],
+      highway: [
+        {url:'https://images.unsplash.com/photo-1626443827633-d7a4d2376bab?w=1080&fit=crop&q=80', name:'I-40, Little Rock, AR'},
+        {url:'https://images.unsplash.com/photo-1628875804415-e5c54aca65df?w=1080&fit=crop&q=80', name:'I-30, Hot Springs, AR'}
+      ],
+      school: [
+        {url:'https://images.unsplash.com/photo-1741639309891-954860932e73?w=1080&fit=crop&q=80', name:'University of Arkansas, Fayetteville, AR'},
+        {url:'https://plus.unsplash.com/premium_photo-1658506724186-63a705425f89?w=1080&fit=crop&q=80', name:'UAMS, Little Rock, AR'}
+      ],
+      hospital: [
+        {url:'https://plus.unsplash.com/premium_photo-1661578549774-7906388bc733?w=1080&fit=crop&q=80', name:'UAMS Medical Center, Little Rock, AR'},
+        {url:'https://images.unsplash.com/photo-1597807037496-c56a1d8bc29a?w=1080&fit=crop&q=80', name:'Baptist Health, Little Rock, AR'}
+      ]
+    },
+    'tennessee': {
+      bridge: [
+        {url:'https://images.unsplash.com/photo-1616813603522-dbb172aff7a0?w=1080&fit=crop&q=80', name:'Seigenthaler Bridge, Nashville, TN'},
+        {url:'https://images.unsplash.com/photo-1698323352393-8a527e758de8?w=1080&fit=crop&q=80', name:'Shelby Street Bridge, Nashville, TN'},
+        {url:'https://images.unsplash.com/photo-1685470684397-d9f563039da0?w=1080&fit=crop&q=80', name:'Woodland Street Bridge, Nashville, TN'}
+      ],
+      highway: [
+        {url:'https://plus.unsplash.com/premium_photo-1733259613451-6ec06b61db8e?w=1080&fit=crop&q=80', name:'I-40, Nashville, TN'},
+        {url:'https://images.unsplash.com/photo-1635553248176-de445d7a0875?w=1080&fit=crop&q=80', name:'I-65, Nashville, TN'}
+      ],
+      school: [
+        {url:'https://images.unsplash.com/photo-1640456515709-6a8cff434df9?w=1080&fit=crop&q=80', name:'Vanderbilt University, Nashville, TN'},
+        {url:'https://images.unsplash.com/photo-1741639309920-451e9a913d06?w=1080&fit=crop&q=80', name:'University of Tennessee, Knoxville, TN'}
+      ],
+      hospital: [
+        {url:'https://plus.unsplash.com/premium_photo-1673988726931-127584121c34?w=1080&fit=crop&q=80', name:'Vanderbilt Medical Center, Nashville, TN'},
+        {url:'https://images.unsplash.com/photo-1769147555720-71fc71bfc216?w=1080&fit=crop&q=80', name:'Baptist Memorial Hospital, Memphis, TN'}
+      ]
+    }
+  };
+
+  let currentLandmark = '';
   let currentStyle = 'bridge';
   let currentTone = 'generous';
   let userPhoto = null;  // data URL of uploaded photo
@@ -788,29 +938,32 @@
     const cropImg = document.getElementById('crop-image');
     const container = document.getElementById('crop-container');
 
+    // Show crop UI FIRST so container has layout dimensions
+    document.getElementById('upload-zone').style.display = 'none';
+    document.getElementById('crop-area').classList.add('visible');
+
     cropImg.onload = () => {
-      const cW = container.clientWidth;
-      const cH = container.clientHeight;
-      const imgAspect = cropImg.naturalWidth / cropImg.naturalHeight;
-      const containerAspect = cW / cH;
+      // Wait a frame for layout to compute
+      requestAnimationFrame(() => {
+        const cW = container.clientWidth;
+        const cH = container.clientHeight;
+        const imgAspect = cropImg.naturalWidth / cropImg.naturalHeight;
+        const containerAspect = cW / cH;
 
-      // Cover fit: image fills the container completely
-      if (imgAspect > containerAspect) {
-        cropBaseH = cH;
-        cropBaseW = cH * imgAspect;
-      } else {
-        cropBaseW = cW;
-        cropBaseH = cW / imgAspect;
-      }
+        // Cover fit: image fills the container completely
+        if (imgAspect > containerAspect) {
+          cropBaseH = cH;
+          cropBaseW = cH * imgAspect;
+        } else {
+          cropBaseW = cW;
+          cropBaseH = cW / imgAspect;
+        }
 
-      cropScale = 1;
-      cropX = (cW - cropBaseW) / 2;
-      cropY = (cH - cropBaseH) / 2;
-      applyCropTransform();
-
-      // Show crop UI, hide upload zone
-      document.getElementById('upload-zone').style.display = 'none';
-      document.getElementById('crop-area').classList.add('visible');
+        cropScale = 1;
+        cropX = (cW - cropBaseW) / 2;
+        cropY = (cH - cropBaseH) / 2;
+        applyCropTransform();
+      });
     };
     cropImg.src = src;
   }
@@ -949,8 +1102,17 @@
     // Load user photo
     const photoImg = new Image();
     photoImg.onload = () => {
-      // Determine if we need a background image
-      const bgUrl = (currentStyle !== 'receipt') ? state.bgImages[currentStyle] : null;
+      // Determine background image (random from set)
+      let bgUrl = null;
+      currentLandmark = '';
+      if (currentStyle !== 'receipt') {
+        const entries = bgImageSets[stateKey]?.[currentStyle];
+        if (entries && entries.length > 0) {
+          const pick = entries[Math.floor(Math.random() * entries.length)];
+          bgUrl = pick.url;
+          currentLandmark = pick.name;
+        }
+      }
 
       const bgPromise = bgUrl ? loadImage(bgUrl).catch(() => null) : Promise.resolve(null);
 
@@ -1133,14 +1295,9 @@
   }
 
   function sceneLabel(style, stateName) {
-    const map = {
-      bridge:   `and the bridges of ${stateName}`,
-      highway:  `and the highways of ${stateName}`,
-      school:   `and the schools of ${stateName}`,
-      hospital: `and the hospitals of ${stateName}`,
-      receipt:  `Here is your receipt, ${stateName}`
-    };
-    return map[style] || `and the infrastructure of ${stateName}`;
+    if (currentLandmark) return currentLandmark;
+    if (style === 'receipt') return `Here is your receipt, ${stateName}`;
+    return `and the infrastructure of ${stateName}`;
   }
 
   function toneTagline(tone) {
