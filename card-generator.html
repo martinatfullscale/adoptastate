@@ -503,7 +503,15 @@
 
     <!-- CARD STYLE -->
     <div class="control-group">
-      <label class="control-label">03 — Card Style</label>
+      <label class="control-label">03 — Format</label>
+      <div class="style-pills">
+        <button class="pill active" onclick="setRatio('square', this)">◻️ Square</button>
+        <button class="pill" onclick="setRatio('story', this)">📱 Story</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label">04 — Card Style</label>
       <div class="style-pills">
         <button class="pill active" onclick="setStyle('bridge', this)">🌉 Bridge</button>
         <button class="pill" onclick="setStyle('highway', this)">🛣️ Highway</button>
@@ -515,7 +523,7 @@
 
     <!-- TONE -->
     <div class="control-group">
-      <label class="control-label">04 — Tone</label>
+      <label class="control-label">05 — Tone</label>
       <div class="style-pills">
         <button class="pill active" onclick="setTone('generous', this)">😇 Generous</button>
         <button class="pill" onclick="setTone('petty', this)">😤 Petty</button>
@@ -846,6 +854,7 @@
   let currentLandmark = '';
   let currentStyle = 'bridge';
   let currentTone = 'generous';
+  let currentRatio = 'square';
   let userPhoto = null;  // data URL of uploaded photo
 
   // ── CROP STATE ──
@@ -877,6 +886,14 @@
   // ── UI FUNCTIONS ──
   function setStyle(s, el) {
     currentStyle = s;
+    document.querySelectorAll('.style-pills .pill').forEach(p => {
+      if (p.closest('.control-group') === el.closest('.control-group')) p.classList.remove('active');
+    });
+    el.classList.add('active');
+  }
+
+  function setRatio(r, el) {
+    currentRatio = r;
     document.querySelectorAll('.style-pills .pill').forEach(p => {
       if (p.closest('.control-group') === el.closest('.control-group')) p.classList.remove('active');
     });
@@ -1103,9 +1120,13 @@
 
     const canvas = document.getElementById('output-canvas');
     const ctx = canvas.getContext('2d');
-    const W = 1080, H = 1080;
+    const W = 1080;
+    const H = currentRatio === 'story' ? 1920 : 1080;
     canvas.width = W;
     canvas.height = H;
+
+    // Update placeholder and canvas aspect ratio
+    document.getElementById('canvas-placeholder').style.aspectRatio = currentRatio === 'story' ? '9/16' : '1';
 
     const state = states[stateKey];
 
@@ -1140,6 +1161,61 @@
   }
 
   function drawCard(ctx, W, H, state, photo, stateKey, bgImg) {
+    const isStory = (H > W);
+
+    // ── LAYOUT VARIABLES (ratio-aware) ──
+    const L = isStory ? {
+      eyebrowY: 120,
+      eyebrowSize: 24,
+      lineY: 140,
+      photoSize: 320,
+      photoY: H * 0.30,
+      emojiSize: 64,
+      emojiGap: 42,
+      fundedY: H * 0.50,
+      fundedSize: 68,
+      stateNameY: H * 0.50 + 95,
+      stateNameSize: 80,
+      subtitleY: H * 0.50 + 160,
+      subtitleSize: 34,
+      boxW: 560, boxH: 100,
+      boxY: H * 0.50 + 210,
+      statNumSize: 40,
+      statLabelSize: 18,
+      statNumOff: 42,
+      statLabelOff: 76,
+      toneY: H - 120,
+      toneSize: 30,
+      tagY: H - 60,
+      tagSize: 22,
+      grainCount: 14000
+    } : {
+      eyebrowY: 72,
+      eyebrowSize: 22,
+      lineY: 88,
+      photoSize: 240,
+      photoY: H * 0.38,
+      emojiSize: 56,
+      emojiGap: 36,
+      fundedY: H * 0.62,
+      fundedSize: 62,
+      stateNameY: H * 0.62 + 82,
+      stateNameSize: 72,
+      subtitleY: H * 0.62 + 136,
+      subtitleSize: 30,
+      boxW: 520, boxH: 90,
+      boxY: H * 0.62 + 168,
+      statNumSize: 36,
+      statLabelSize: 17,
+      statNumOff: 38,
+      statLabelOff: 68,
+      toneY: H - 82,
+      toneSize: 26,
+      tagY: H - 44,
+      tagSize: 20,
+      grainCount: 8000
+    };
+
     // ── BACKGROUND ──
     const bg = ctx.createLinearGradient(0, 0, W, H);
     bg.addColorStop(0, '#1a1208');
@@ -1152,8 +1228,9 @@
     if (bgImg) {
       // Draw background image cover-fit
       const imgAspect = bgImg.width / bgImg.height;
+      const canvasAspect = W / H;
       let dw, dh, dx, dy;
-      if (imgAspect > 1) {
+      if (imgAspect > canvasAspect) {
         dh = H; dw = H * imgAspect;
         dx = (W - dw) / 2; dy = 0;
       } else {
@@ -1174,7 +1251,7 @@
     ctx.fillRect(0, 0, W, H);
 
     // ── GRAIN TEXTURE ──
-    for (let i = 0; i < 8000; i++) {
+    for (let i = 0; i < L.grainCount; i++) {
       const x = Math.random() * W;
       const y = Math.random() * H;
       const a = Math.random() * 0.03;
@@ -1183,9 +1260,9 @@
     }
 
     // ── PHOTO CIRCLE ──
-    const photoSize = 240;
+    const photoSize = L.photoSize;
     const photoX = W / 2;
-    const photoY = H * 0.38;
+    const photoY = L.photoY;
 
     // Shadow
     ctx.save();
@@ -1234,38 +1311,38 @@
 
     // ── TOP EYEBROW ──
     ctx.fillStyle = '#c8860a';
-    ctx.font = '500 22px "DM Mono", monospace';
+    ctx.font = `500 ${L.eyebrowSize}px "DM Mono", monospace`;
     ctx.textAlign = 'center';
-    ctx.fillText('A D O P T - A - S T A T E', W / 2, 72);
+    ctx.fillText('A D O P T - A - S T A T E', W / 2, L.eyebrowY);
 
     // Thin line
     ctx.fillStyle = 'rgba(200,134,10,0.3)';
-    ctx.fillRect(W/2 - 160, 88, 320, 1);
+    ctx.fillRect(W/2 - 160, L.lineY, 320, 1);
 
     // ── STATE EMOJI & BADGE ──
-    ctx.font = '56px serif';
-    ctx.fillText(state.emoji, W / 2, photoY - photoSize / 2 - 36);
+    ctx.font = `${L.emojiSize}px serif`;
+    ctx.fillText(state.emoji, W / 2, photoY - photoSize / 2 - L.emojiGap);
 
     // ── MAIN TEXT ──
     ctx.fillStyle = '#f4efe4';
-    ctx.font = 'bold 62px "Playfair Display", Georgia, serif';
+    ctx.font = `bold ${L.fundedSize}px "Playfair Display", Georgia, serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('I funded', W / 2, H * 0.62);
+    ctx.fillText('I funded', W / 2, L.fundedY);
 
     // State name in amber
     ctx.fillStyle = '#c8860a';
-    ctx.font = 'bold 72px "Playfair Display", Georgia, serif';
-    ctx.fillText(state.name.toUpperCase(), W / 2, H * 0.62 + 82);
+    ctx.font = `bold ${L.stateNameSize}px "Playfair Display", Georgia, serif`;
+    ctx.fillText(state.name.toUpperCase(), W / 2, L.stateNameY);
 
     // Subtitle
     ctx.fillStyle = 'rgba(244,239,228,0.6)';
-    ctx.font = '300 30px "Source Serif 4", Georgia, serif';
-    ctx.fillText(sceneLabel(currentStyle, state.name), W / 2, H * 0.62 + 136);
+    ctx.font = `300 ${L.subtitleSize}px "Source Serif 4", Georgia, serif`;
+    ctx.fillText(sceneLabel(currentStyle, state.name), W / 2, L.subtitleY);
 
     // ── STATS BOX ──
-    const boxW = 520, boxH = 90;
+    const boxW = L.boxW, boxH = L.boxH;
     const boxX = W / 2 - boxW / 2;
-    const boxY = H * 0.62 + 168;
+    const boxY = L.boxY;
 
     ctx.fillStyle = 'rgba(200,134,10,0.12)';
     ctx.strokeStyle = 'rgba(200,134,10,0.35)';
@@ -1275,15 +1352,15 @@
 
     // Stats text
     ctx.fillStyle = '#c8860a';
-    ctx.font = 'bold 36px "Playfair Display", serif';
+    ctx.font = `bold ${L.statNumSize}px "Playfair Display", serif`;
     ctx.textAlign = 'center';
-    ctx.fillText(state.ratio, boxX + boxW * 0.28, boxY + 38);
-    ctx.fillText(state.net, boxX + boxW * 0.72, boxY + 38);
+    ctx.fillText(state.ratio, boxX + boxW * 0.28, boxY + L.statNumOff);
+    ctx.fillText(state.net, boxX + boxW * 0.72, boxY + L.statNumOff);
 
     ctx.fillStyle = 'rgba(244,239,228,0.4)';
-    ctx.font = '500 17px "DM Mono", monospace';
-    ctx.fillText('received per $1', boxX + boxW * 0.28, boxY + 68);
-    ctx.fillText('net received', boxX + boxW * 0.72, boxY + 68);
+    ctx.font = `500 ${L.statLabelSize}px "DM Mono", monospace`;
+    ctx.fillText('received per $1', boxX + boxW * 0.28, boxY + L.statLabelOff);
+    ctx.fillText('net received', boxX + boxW * 0.72, boxY + L.statLabelOff);
 
     // Divider
     ctx.fillStyle = 'rgba(200,134,10,0.25)';
@@ -1291,16 +1368,16 @@
 
     // ── BOTTOM TAG ──
     ctx.fillStyle = 'rgba(244,239,228,0.25)';
-    ctx.font = '500 20px "DM Mono", monospace';
+    ctx.font = `500 ${L.tagSize}px "DM Mono", monospace`;
     ctx.textAlign = 'center';
-    ctx.fillText('#AdoptAState  •  adoptastate.org', W / 2, H - 44);
+    ctx.fillText('#AdoptAState  •  adoptastate.org', W / 2, L.tagY);
 
     // ── TONE TAGLINE ──
     ctx.save();
-    ctx.font = 'italic bold 26px "Playfair Display", serif';
+    ctx.font = `italic bold ${L.toneSize}px "Playfair Display", serif`;
     ctx.textAlign = 'center';
     ctx.fillStyle = '#c8860a';
-    ctx.fillText(toneTagline(currentTone), W / 2, H - 82);
+    ctx.fillText(toneTagline(currentTone), W / 2, L.toneY);
     ctx.restore();
   }
 
@@ -1338,7 +1415,8 @@
     const stateKey = document.getElementById('state-select').value;
     const stateName = states[stateKey]?.name || 'state';
     const link = document.createElement('a');
-    link.download = `adopt-a-state-${stateName.toLowerCase().replace(/ /g, '-')}.png`;
+    const suffix = currentRatio === 'story' ? '-story' : '';
+    link.download = `adopt-a-state-${stateName.toLowerCase().replace(/ /g, '-')}${suffix}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
   }
