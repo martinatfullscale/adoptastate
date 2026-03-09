@@ -908,9 +908,11 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      .hero-content { padding: 60px 30px; }
+      .hero { flex-direction: column; min-height: auto; }
+      .hero-content { padding: 60px 30px 40px; }
+      .hero-stat-bar { position: static; gap: 20px; flex-wrap: wrap; padding: 24px 16px; }
+      .hero-stat { flex: 1 1 40%; }
       nav .nav-links { display: none; }
-      .hero-stat-bar { gap: 30px; flex-wrap: wrap; padding: 20px 16px; }
       .intro { margin: 60px auto; padding: 0 24px; }
       .card-cta-section { padding: 70px 24px; }
       .card-cta-btn { padding: 18px 36px; font-size: 14px; }
