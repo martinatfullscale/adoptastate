@@ -8,39 +8,31 @@
   <style>
     :root {
       --cream: #f5f0e8;
-      --warm-white: #faf8f3;
       --brown: #3a2a1a;
-      --mid-brown: #7a5c3a;
       --amber: #c8860a;
       --faded-red: #b84040;
       --faded-blue: #3a5a8a;
       --dark: #1e1208;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       background: #1a1510;
       color: var(--cream);
       font-family: 'Source Serif 4', Georgia, serif;
       padding: 40px 20px;
     }
-
     h1 {
       font-family: 'Playfair Display', serif;
       text-align: center;
       font-size: 28px;
       margin-bottom: 8px;
-      color: var(--cream);
     }
-
     .subtitle {
       text-align: center;
       font-size: 14px;
       color: rgba(245,240,232,0.5);
       margin-bottom: 32px;
     }
-
     .controls {
       display: flex;
       justify-content: center;
@@ -48,7 +40,6 @@
       margin-bottom: 40px;
       flex-wrap: wrap;
     }
-
     .controls button {
       padding: 12px 28px;
       font-family: 'DM Mono', monospace;
@@ -59,20 +50,14 @@
       border: none;
       transition: all 0.15s;
     }
-
-    .btn-generate {
-      background: var(--amber);
-      color: white;
-    }
+    .btn-generate { background: var(--amber); color: white; }
     .btn-generate:hover { background: #a06d08; }
-
     .btn-save {
       background: transparent;
       border: 1px solid rgba(244,239,228,0.3) !important;
       color: var(--cream);
     }
     .btn-save:hover { border-color: var(--amber) !important; color: var(--amber); }
-
     .carousel-strip {
       display: flex;
       gap: 16px;
@@ -81,23 +66,19 @@
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
     }
-
     .carousel-strip::-webkit-scrollbar { height: 6px; }
     .carousel-strip::-webkit-scrollbar-track { background: rgba(244,239,228,0.05); }
     .carousel-strip::-webkit-scrollbar-thumb { background: rgba(200,134,10,0.3); border-radius: 3px; }
-
     .slide-wrapper {
       flex-shrink: 0;
       scroll-snap-align: center;
       text-align: center;
     }
-
     .slide-wrapper canvas {
       width: 270px;
       height: 337px;
       border: 1px solid rgba(244,239,228,0.1);
     }
-
     .slide-label {
       font-family: 'DM Mono', monospace;
       font-size: 9px;
@@ -106,7 +87,6 @@
       margin-top: 8px;
       text-transform: uppercase;
     }
-
     .progress {
       text-align: center;
       font-family: 'DM Mono', monospace;
@@ -132,7 +112,114 @@
 
 <script>
 const W = 1080, H = 1350;
-const PAD = 80;
+const PAD = 100;
+const CX = W / 2;
+
+// ── Drawing Helpers (sized for phone viewing) ──
+
+function drawGrain(ctx) {
+  const imgData = ctx.createImageData(W, H);
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const v = Math.random() * 255;
+    imgData.data[i] = v;
+    imgData.data[i+1] = v;
+    imgData.data[i+2] = v;
+    imgData.data[i+3] = 8;
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+function eyebrow(ctx, text, y) {
+  ctx.font = '24px "DM Mono", monospace';
+  ctx.fillStyle = '#c8860a';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, CX, y);
+}
+
+function title(ctx, text, y, size) {
+  ctx.font = `bold ${size}px "Playfair Display", serif`;
+  ctx.fillStyle = 'rgba(245,240,232,0.95)';
+  ctx.textAlign = 'center';
+  text.split('\n').forEach((line, i) => {
+    ctx.fillText(line, CX, y + i * (size * 1.18));
+  });
+}
+
+function italic(ctx, text, y, size, color) {
+  ctx.font = `italic ${size}px "Playfair Display", serif`;
+  ctx.fillStyle = color || 'rgba(245,240,232,0.5)';
+  ctx.textAlign = 'center';
+  text.split('\n').forEach((line, i) => {
+    ctx.fillText(line, CX, y + i * (size * 1.35));
+  });
+}
+
+function body(ctx, text, y, size) {
+  ctx.font = `300 ${size}px "Source Serif 4", serif`;
+  ctx.fillStyle = 'rgba(245,240,232,0.7)';
+  ctx.textAlign = 'center';
+  text.split('\n').forEach((line, i) => {
+    ctx.fillText(line, CX, y + i * (size * 1.55));
+  });
+}
+
+function amberLine(ctx, y) {
+  ctx.strokeStyle = '#c8860a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(CX - 50, y);
+  ctx.lineTo(CX + 50, y);
+  ctx.stroke();
+}
+
+function footer(ctx, text) {
+  ctx.font = '22px "DM Mono", monospace';
+  ctx.fillStyle = 'rgba(245,240,232,0.2)';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, CX, H - 60);
+}
+
+function bigStat(ctx, text, y) {
+  ctx.font = 'bold 180px "Playfair Display", serif';
+  ctx.fillStyle = '#c8860a';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, CX, y);
+}
+
+function statPair(ctx, n1, l1, n2, l2, y) {
+  const colW = (W - PAD * 2) / 2;
+  ctx.textAlign = 'center';
+  // Left
+  ctx.font = 'bold 72px "Playfair Display", serif';
+  ctx.fillStyle = '#b84040';
+  ctx.fillText(n1, PAD + colW/2, y);
+  ctx.font = '26px "Source Serif 4", serif';
+  ctx.fillStyle = 'rgba(245,240,232,0.5)';
+  ctx.fillText(l1, PAD + colW/2, y + 44);
+  // Right
+  ctx.font = 'bold 72px "Playfair Display", serif';
+  ctx.fillStyle = '#b84040';
+  ctx.fillText(n2, PAD + colW + colW/2, y);
+  ctx.font = '26px "Source Serif 4", serif';
+  ctx.fillStyle = 'rgba(245,240,232,0.5)';
+  ctx.fillText(l2, PAD + colW + colW/2, y + 44);
+}
+
+function wrapText(ctx, text, x, y, maxW, lh) {
+  const words = text.split(' ');
+  let line = '', ty = y;
+  for (const w of words) {
+    const test = line + w + ' ';
+    if (ctx.measureText(test).width > maxW && line) {
+      ctx.fillText(line.trim(), x, ty);
+      line = w + ' ';
+      ty += lh;
+    } else { line = test; }
+  }
+  ctx.fillText(line.trim(), x, ty);
+}
+
+// ── 10 Slides ──
 
 const SLIDES = [
   // 1 — Cover
@@ -140,11 +227,11 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      drawEyebrow(ctx, 'A TAXPAYER AWARENESS INITIATIVE', H * 0.22);
-      drawTitle(ctx, 'You\'ve Been\nGiving\nAll Along.', H * 0.32, 72);
-      drawAmberLine(ctx, H * 0.62);
-      drawBody(ctx, 'For years, blue-state taxpayers have\nquietly funded red-state infrastructure.\nNo press release. No thank you note.', H * 0.67, 28);
-      drawFooter(ctx, 'iadoptedastate.org');
+      eyebrow(ctx, 'A TAXPAYER AWARENESS INITIATIVE', H * 0.20);
+      title(ctx, 'You\'ve Been\nGiving\nAll Along.', H * 0.33, 100);
+      amberLine(ctx, H * 0.62);
+      body(ctx, 'Blue-state taxpayers quietly fund\nred-state infrastructure.\nNo thank you note. Ever.', H * 0.68, 36);
+      footer(ctx, 'iadoptedastate.org');
     }
   },
   // 2 — The Big Number
@@ -152,12 +239,16 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      drawEyebrow(ctx, 'THE FACTS', H * 0.25);
-      drawBigStat(ctx, '$13.7B', H * 0.42);
-      drawStatLabel(ctx, 'California\'s net contribution\nto the federal system (FY 2023)', H * 0.56);
-      drawAmberLine(ctx, H * 0.68);
-      drawBody(ctx, 'That money went to roads, hospitals, and\nschools in states that never said thank you.', H * 0.73, 26);
-      drawFooter(ctx, 'Source: Rockefeller Institute of Government');
+      eyebrow(ctx, 'THE FACTS', H * 0.22);
+      bigStat(ctx, '$13.7B', H * 0.42);
+      ctx.font = '36px "Source Serif 4", serif';
+      ctx.fillStyle = 'rgba(245,240,232,0.6)';
+      ctx.textAlign = 'center';
+      ctx.fillText('California\'s net contribution', CX, H * 0.50);
+      ctx.fillText('to the federal system', CX, H * 0.55);
+      amberLine(ctx, H * 0.64);
+      body(ctx, 'Roads. Hospitals. Schools.\nIn states that never said\nthank you.', H * 0.71, 38);
+      footer(ctx, 'Rockefeller Institute of Government');
     }
   },
   // 3 — Mississippi
@@ -165,14 +256,16 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      drawEyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.18);
-      drawStateEmoji(ctx, '🌊', H * 0.28);
-      drawTitle(ctx, 'Mississippi', H * 0.40, 64);
-      drawItalic(ctx, '"America\'s Most Beloved Beneficiary"', H * 0.48, 22);
-      drawAmberLine(ctx, H * 0.54);
-      drawTwoStats(ctx, '$2.13', 'received per $1 sent', '$4.1B', 'net received (2023)', H * 0.60);
-      drawBody(ctx, 'Mississippi has received more than it\ncontributes for decades. With your support,\nits roads remain passable and its\nbridges remain... largely intact.', H * 0.76, 24);
-      drawFooter(ctx, 'iadoptedastate.org');
+      eyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.14);
+      ctx.font = '140px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🌊', CX, H * 0.27);
+      title(ctx, 'Mississippi', H * 0.37, 90);
+      italic(ctx, '"America\'s Most Beloved\nBeneficiary"', H * 0.44, 34);
+      amberLine(ctx, H * 0.54);
+      statPair(ctx, '$2.13', 'per $1 sent', '$4.1B', 'net received', H * 0.63);
+      body(ctx, 'Your taxes keep its roads\npassable and its bridges\nlargely intact.', H * 0.78, 36);
+      footer(ctx, 'iadoptedastate.org');
     }
   },
   // 4 — Kentucky
@@ -180,14 +273,16 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      drawEyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.18);
-      drawStateEmoji(ctx, '🐎', H * 0.28);
-      drawTitle(ctx, 'Kentucky', H * 0.40, 64);
-      drawItalic(ctx, '"Bootstraps Not Included"', H * 0.48, 22);
-      drawAmberLine(ctx, H * 0.54);
-      drawTwoStats(ctx, '$2.41', 'received per $1 sent', '$22.9B', 'net received (2023)', H * 0.60);
-      drawBody(ctx, 'Kentucky receives the most federal aid\nper capita. It has strong opinions about\ngovernment spending. These two facts\nare, reportedly, unrelated.', H * 0.76, 24);
-      drawFooter(ctx, 'iadoptedastate.org');
+      eyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.14);
+      ctx.font = '140px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🐎', CX, H * 0.27);
+      title(ctx, 'Kentucky', H * 0.37, 90);
+      italic(ctx, '"Bootstraps Not Included"', H * 0.44, 34);
+      amberLine(ctx, H * 0.54);
+      statPair(ctx, '$2.41', 'per $1 sent', '$22.9B', 'net received', H * 0.63);
+      body(ctx, 'Most federal aid per capita.\nStrong opinions about\ngovernment spending.', H * 0.78, 36);
+      footer(ctx, 'iadoptedastate.org');
     }
   },
   // 5 — West Virginia
@@ -195,14 +290,16 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      drawEyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.18);
-      drawStateEmoji(ctx, '⛰️', H * 0.28);
-      drawTitle(ctx, 'West Virginia', H * 0.40, 58);
-      drawItalic(ctx, '"Almost Heaven, Fully Funded"', H * 0.48, 22);
-      drawAmberLine(ctx, H * 0.54);
-      drawTwoStats(ctx, '$2.07', 'received per $1 sent', '$6.5B', 'net received (2023)', H * 0.60);
-      drawBody(ctx, 'Mountain roads, rural hospitals, and aging\ninfrastructure maintained by the generous,\ninvoluntary contributions of NY, NJ,\nand CA taxpayers.', H * 0.76, 24);
-      drawFooter(ctx, 'iadoptedastate.org');
+      eyebrow(ctx, 'MEET YOUR BENEFICIARY', H * 0.14);
+      ctx.font = '140px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('⛰️', CX, H * 0.27);
+      title(ctx, 'West Virginia', H * 0.37, 82);
+      italic(ctx, '"Almost Heaven,\nFully Funded"', H * 0.44, 34);
+      amberLine(ctx, H * 0.54);
+      statPair(ctx, '$2.07', 'per $1 sent', '$6.5B', 'net received', H * 0.63);
+      body(ctx, 'Its infrastructure maintained\nby the involuntary generosity\nof NY, NJ, and CA.', H * 0.78, 36);
+      footer(ctx, 'iadoptedastate.org');
     }
   },
   // 6 — The Scoreboard
@@ -210,28 +307,27 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      drawEyebrow(ctx, 'BY THE NUMBERS', H * 0.15);
-      drawTitle(ctx, 'The\nScoreboard.', H * 0.22, 60);
-      drawAmberLine(ctx, H * 0.40);
+      eyebrow(ctx, 'BY THE NUMBERS', H * 0.12);
+      title(ctx, 'The\nScoreboard.', H * 0.20, 88);
+      amberLine(ctx, H * 0.38);
       const rows = [
         ['34 states', 'receive more than they give'],
         ['$0', 'thank you notes received'],
-        ['77%', 'of Mississippi\'s Medicaid paid by you'],
+        ['77%', 'of MS Medicaid paid by you'],
         ['$3,284/yr', 'Alaska pays residents to live there'],
-        ['$15.6B', 'AL military bases funded by your taxes'],
       ];
-      let y = H * 0.46;
+      let y = H * 0.44;
       rows.forEach(([num, label]) => {
-        ctx.font = 'bold 32px "Playfair Display", serif';
+        ctx.font = 'bold 56px "Playfair Display", serif';
         ctx.fillStyle = '#c8860a';
         ctx.textAlign = 'left';
         ctx.fillText(num, PAD, y);
-        ctx.font = '20px "Source Serif 4", serif';
-        ctx.fillStyle = 'rgba(245,240,232,0.6)';
-        ctx.fillText(label, PAD, y + 30);
-        y += 86;
+        ctx.font = '32px "Source Serif 4", serif';
+        ctx.fillStyle = 'rgba(245,240,232,0.55)';
+        ctx.fillText(label, PAD, y + 48);
+        y += 120;
       });
-      drawFooter(ctx, 'Source: Tax Foundation, USASpending.gov');
+      footer(ctx, 'Tax Foundation · USASpending.gov');
     }
   },
   // 7 — Sponsored Infrastructure
@@ -239,27 +335,27 @@ const SLIDES = [
     bg: '#3a5a8a',
     render(ctx) {
       drawGrain(ctx);
-      drawEyebrow(ctx, 'BROUGHT TO YOU BY', H * 0.18);
-      drawTitle(ctx, 'Sponsored\nInfrastructure.', H * 0.27, 56);
-      drawAmberLine(ctx, H * 0.44);
+      eyebrow(ctx, 'BROUGHT TO YOU BY', H * 0.14);
+      title(ctx, 'Sponsored\nInfrastructure.', H * 0.24, 80);
+      amberLine(ctx, H * 0.42);
       const items = [
-        ['I-65 Expansion, Louisville KY', 'New York Taxpayers 🧡'],
-        ['Medicaid Coverage, Jackson MS', 'California Taxpayers 🧡'],
-        ['Rural Broadband, Morgantown WV', 'New Jersey Taxpayers 🧡'],
-        ['FEMA Relief, Charleston SC', 'Massachusetts Taxpayers 🧡'],
+        ['I-65 Expansion, KY', 'New York Taxpayers 🧡'],
+        ['Medicaid, Jackson MS', 'California Taxpayers 🧡'],
+        ['Rural Broadband, WV', 'New Jersey Taxpayers 🧡'],
+        ['FEMA Relief, SC', 'Massachusetts Taxpayers 🧡'],
       ];
-      let y = H * 0.50;
+      let y = H * 0.49;
       items.forEach(([proj, sponsor]) => {
-        ctx.font = '24px "Source Serif 4", serif';
+        ctx.font = '36px "Source Serif 4", serif';
         ctx.fillStyle = 'rgba(245,240,232,0.9)';
         ctx.textAlign = 'left';
         ctx.fillText(proj, PAD, y);
-        ctx.font = '18px "Source Serif 4", serif';
+        ctx.font = '28px "Source Serif 4", serif';
         ctx.fillStyle = '#c8860a';
-        ctx.fillText(sponsor, PAD, y + 30);
-        y += 82;
+        ctx.fillText(sponsor, PAD, y + 42);
+        y += 110;
       });
-      drawFooter(ctx, 'Real projects. Real federal dollars.');
+      footer(ctx, 'Real projects. Real federal dollars.');
     }
   },
   // 8 — The Quote
@@ -267,19 +363,18 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      ctx.font = 'italic 40px "Playfair Display", serif';
+      ctx.font = 'italic 52px "Playfair Display", serif';
       ctx.fillStyle = 'rgba(245,240,232,0.9)';
       ctx.textAlign = 'center';
-      wrapText(ctx, '"The beauty of Adopt-A-State is that you never had a choice. But you can still feel good about it."', W / 2, H * 0.35, W - PAD * 2, 56);
-      drawAmberLine(ctx, H * 0.68);
-      ctx.font = '14px "Source Serif 4", serif';
+      wrapText(ctx, '"The beauty of Adopt-A-State is that you never had a choice. But you can still feel good about it."', CX, H * 0.28, W - PAD * 2, 72);
+      amberLine(ctx, H * 0.66);
+      ctx.font = '26px "DM Mono", monospace';
       ctx.fillStyle = '#c8860a';
-      ctx.letterSpacing = '3px';
-      ctx.fillText('— ADOPT-A-STATE FOUNDER', W / 2, H * 0.73);
-      ctx.font = '13px "Source Serif 4", serif';
+      ctx.fillText('ADOPT-A-STATE FOUNDER', CX, H * 0.72);
+      ctx.font = '24px "Source Serif 4", serif';
       ctx.fillStyle = 'rgba(245,240,232,0.4)';
-      ctx.fillText('Unpaid, Like Most of This', W / 2, H * 0.76);
-      drawFooter(ctx, 'iadoptedastate.org');
+      ctx.fillText('Unpaid, Like Most of This', CX, H * 0.76);
+      footer(ctx, 'iadoptedastate.org');
     }
   },
   // 9 — Make Your Card CTA
@@ -287,12 +382,12 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      drawEyebrow(ctx, 'SHOW YOUR APPRECIATION', H * 0.25);
-      drawTitle(ctx, 'Make Your\nOwn Card.', H * 0.35, 68);
-      drawAmberItalic(ctx, 'Since They Won\'t\nDo It for You.', H * 0.55, 40);
-      drawAmberLine(ctx, H * 0.68);
-      drawBody(ctx, 'Upload your photo, pick your state,\nand generate a shareable card that says\nwhat they never will: thank you.', H * 0.73, 26);
-      drawFooter(ctx, 'iadoptedastate.org/card-generator');
+      eyebrow(ctx, 'SHOW YOUR APPRECIATION', H * 0.22);
+      title(ctx, 'Make Your\nOwn Card.', H * 0.34, 96);
+      italic(ctx, 'Since They Won\'t\nDo It for You.', H * 0.55, 52, '#c8860a');
+      amberLine(ctx, H * 0.70);
+      body(ctx, 'Upload your photo. Pick your state.\nSay what they never will.', H * 0.76, 36);
+      footer(ctx, 'iadoptedastate.org/card-generator');
     }
   },
   // 10 — Closer / CTA
@@ -300,164 +395,27 @@ const SLIDES = [
     bg: '#1e1208',
     render(ctx) {
       drawGrain(ctx);
-      ctx.font = '160px serif';
+      ctx.font = '200px serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🫶', W / 2, H * 0.30);
-      drawTitle(ctx, 'Adopt-A-State', H * 0.42, 56);
-      drawItalic(ctx, 'A Taxpayer Awareness Initiative', H * 0.48, 20);
-      drawAmberLine(ctx, H * 0.54);
-      drawBody(ctx, 'They can\'t do it alone.\nThey never could.', H * 0.60, 30);
+      ctx.fillText('🫶', CX, H * 0.30);
+      title(ctx, 'Adopt-A-State', H * 0.44, 80);
+      italic(ctx, 'A Taxpayer Awareness Initiative', H * 0.51, 30);
+      amberLine(ctx, H * 0.58);
+      body(ctx, 'They can\'t do it alone.\nThey never could.', H * 0.65, 42);
       // URL box
-      const boxW = 500, boxH = 70;
+      const boxW = 620, boxH = 90;
       ctx.strokeStyle = 'rgba(200,134,10,0.5)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect((W - boxW) / 2, H * 0.72, boxW, boxH);
-      ctx.font = '22px "DM Mono", monospace';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect((W - boxW)/2, H * 0.76, boxW, boxH);
+      ctx.font = '34px "DM Mono", monospace';
       ctx.fillStyle = '#c8860a';
-      ctx.fillText('iadoptedastate.org', W / 2, H * 0.72 + boxH / 2 + 8);
-      ctx.font = '16px "Source Serif 4", serif';
-      ctx.fillStyle = 'rgba(245,240,232,0.4)';
-      ctx.fillText('All data sourced from the Rockefeller Institute', W / 2, H * 0.86);
-      ctx.fillText('of Government, Tax Foundation, and USASpending.gov.', W / 2, H * 0.88);
-      ctx.fillText('This is real. All of it.', W / 2, H * 0.91);
+      ctx.fillText('iadoptedastate.org', CX, H * 0.76 + boxH/2 + 12);
+      ctx.font = '22px "Source Serif 4", serif';
+      ctx.fillStyle = 'rgba(245,240,232,0.35)';
+      ctx.fillText('This is real. All of it.', CX, H * 0.92);
     }
   },
 ];
-
-// ── Drawing Helpers ──
-
-function drawGrain(ctx) {
-  // subtle noise overlay
-  const imgData = ctx.createImageData(W, H);
-  for (let i = 0; i < imgData.data.length; i += 4) {
-    const v = Math.random() * 255;
-    imgData.data[i] = v;
-    imgData.data[i + 1] = v;
-    imgData.data[i + 2] = v;
-    imgData.data[i + 3] = 8;
-  }
-  ctx.putImageData(imgData, 0, 0);
-}
-
-function drawEyebrow(ctx, text, y) {
-  ctx.font = '13px "DM Mono", monospace';
-  ctx.fillStyle = '#c8860a';
-  ctx.textAlign = 'center';
-  ctx.letterSpacing = '4px';
-  ctx.fillText(text, W / 2, y);
-}
-
-function drawTitle(ctx, text, y, size) {
-  ctx.font = `bold ${size}px "Playfair Display", serif`;
-  ctx.fillStyle = 'rgba(245,240,232,0.95)';
-  ctx.textAlign = 'center';
-  const lines = text.split('\n');
-  lines.forEach((line, i) => {
-    ctx.fillText(line, W / 2, y + i * (size * 1.2));
-  });
-}
-
-function drawItalic(ctx, text, y, size) {
-  ctx.font = `italic ${size}px "Source Serif 4", serif`;
-  ctx.fillStyle = 'rgba(245,240,232,0.5)';
-  ctx.textAlign = 'center';
-  ctx.fillText(text, W / 2, y);
-}
-
-function drawAmberItalic(ctx, text, y, size) {
-  ctx.font = `italic ${size}px "Playfair Display", serif`;
-  ctx.fillStyle = '#c8860a';
-  ctx.textAlign = 'center';
-  const lines = text.split('\n');
-  lines.forEach((line, i) => {
-    ctx.fillText(line, W / 2, y + i * (size * 1.3));
-  });
-}
-
-function drawAmberLine(ctx, y) {
-  ctx.strokeStyle = '#c8860a';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(W / 2 - 40, y);
-  ctx.lineTo(W / 2 + 40, y);
-  ctx.stroke();
-}
-
-function drawBody(ctx, text, y, size) {
-  ctx.font = `300 ${size}px "Source Serif 4", serif`;
-  ctx.fillStyle = 'rgba(245,240,232,0.65)';
-  ctx.textAlign = 'center';
-  const lines = text.split('\n');
-  lines.forEach((line, i) => {
-    ctx.fillText(line, W / 2, y + i * (size * 1.6));
-  });
-}
-
-function drawBigStat(ctx, text, y) {
-  ctx.font = 'bold 120px "Playfair Display", serif';
-  ctx.fillStyle = '#c8860a';
-  ctx.textAlign = 'center';
-  ctx.fillText(text, W / 2, y);
-}
-
-function drawStatLabel(ctx, text, y) {
-  ctx.font = '24px "Source Serif 4", serif';
-  ctx.fillStyle = 'rgba(245,240,232,0.6)';
-  ctx.textAlign = 'center';
-  const lines = text.split('\n');
-  lines.forEach((line, i) => {
-    ctx.fillText(line, W / 2, y + i * 36);
-  });
-}
-
-function drawStateEmoji(ctx, emoji, y) {
-  ctx.font = '100px serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(emoji, W / 2, y);
-}
-
-function drawTwoStats(ctx, num1, label1, num2, label2, y) {
-  const colW = (W - PAD * 2) / 2;
-  // Left stat
-  ctx.font = 'bold 48px "Playfair Display", serif';
-  ctx.fillStyle = '#b84040';
-  ctx.textAlign = 'center';
-  ctx.fillText(num1, PAD + colW / 2, y);
-  ctx.font = '14px "Source Serif 4", serif';
-  ctx.fillStyle = 'rgba(245,240,232,0.5)';
-  ctx.fillText(label1, PAD + colW / 2, y + 30);
-  // Right stat
-  ctx.font = 'bold 48px "Playfair Display", serif';
-  ctx.fillStyle = '#b84040';
-  ctx.fillText(num2, PAD + colW + colW / 2, y);
-  ctx.font = '14px "Source Serif 4", serif';
-  ctx.fillStyle = 'rgba(245,240,232,0.5)';
-  ctx.fillText(label2, PAD + colW + colW / 2, y + 30);
-}
-
-function drawFooter(ctx, text) {
-  ctx.font = '13px "DM Mono", monospace';
-  ctx.fillStyle = 'rgba(245,240,232,0.25)';
-  ctx.textAlign = 'center';
-  ctx.fillText(text, W / 2, H - 50);
-}
-
-function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-  const words = text.split(' ');
-  let line = '';
-  let ty = y;
-  for (const word of words) {
-    const test = line + word + ' ';
-    if (ctx.measureText(test).width > maxWidth && line) {
-      ctx.fillText(line.trim(), x, ty);
-      line = word + ' ';
-      ty += lineHeight;
-    } else {
-      line = test;
-    }
-  }
-  ctx.fillText(line.trim(), x, ty);
-}
 
 // ── Generate ──
 
@@ -475,17 +433,14 @@ function generateAll() {
     canvas.id = `slide-${i}`;
     const ctx = canvas.getContext('2d');
 
-    // Background
     ctx.fillStyle = slide.bg;
     ctx.fillRect(0, 0, W, H);
-
-    // Render content
     slide.render(ctx);
 
-    // Slide number indicator (small dots at bottom)
+    // Slide dots
     for (let d = 0; d < 10; d++) {
       ctx.beginPath();
-      ctx.arc(W / 2 - 9 * 4.5 + d * 9, H - 24, 3, 0, Math.PI * 2);
+      ctx.arc(CX - 9*4.5 + d*9, H - 28, 3.5, 0, Math.PI*2);
       ctx.fillStyle = d === i ? '#c8860a' : 'rgba(245,240,232,0.15)';
       ctx.fill();
     }
@@ -495,7 +450,7 @@ function generateAll() {
     wrapper.appendChild(canvas);
     const label = document.createElement('p');
     label.className = 'slide-label';
-    label.textContent = `Slide ${i + 1} of 10`;
+    label.textContent = `Slide ${i+1} of 10`;
     wrapper.appendChild(label);
     strip.appendChild(wrapper);
   });
@@ -504,18 +459,15 @@ function generateAll() {
 }
 
 async function saveAll() {
-  const canvases = document.querySelectorAll('.carousel-strip canvas');
-  if (!canvases.length) {
+  if (!document.querySelectorAll('.carousel-strip canvas').length) {
     generateAll();
     await new Promise(r => setTimeout(r, 100));
   }
-
-  const allCanvases = document.querySelectorAll('.carousel-strip canvas');
-  for (let i = 0; i < allCanvases.length; i++) {
-    const canvas = allCanvases[i];
-    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  const all = document.querySelectorAll('.carousel-strip canvas');
+  for (let i = 0; i < all.length; i++) {
+    const blob = await new Promise(r => all[i].toBlob(r, 'image/png'));
     const link = document.createElement('a');
-    link.download = `adopt-a-state-carousel-${String(i + 1).padStart(2, '0')}.png`;
+    link.download = `adopt-a-state-carousel-${String(i+1).padStart(2,'0')}.png`;
     link.href = URL.createObjectURL(blob);
     link.click();
     URL.revokeObjectURL(link.href);
@@ -523,7 +475,6 @@ async function saveAll() {
   }
 }
 
-// Auto-generate on load
 generateAll();
 </script>
 </body>
